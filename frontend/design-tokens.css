@@ -1,0 +1,61 @@
+/* CardioFlow design tokens — "clinical paper". See PRODUCT_SPEC.md §7.
+   Light theme only (dark mode deferred). Contrast pairs chosen for WCAG AA on their intended backgrounds. */
+:root {
+  /* Surfaces */
+  --cf-canvas: #f6f5f1;          /* app background, warm off-white */
+  --cf-surface: #ffffff;         /* panes */
+  --cf-surface-sunken: #efede7;  /* transcript patient-turn tint, code blocks */
+  --cf-rule: #dedbd2;            /* 1px hairlines */
+  --cf-rule-strong: #c6c2b6;
+
+  /* Ink */
+  --cf-ink: #1c1d1f;             /* primary text */
+  --cf-ink-muted: #5c5f66;       /* secondary text, labels */
+  --cf-ink-faint: #8a8d93;       /* placeholders (not for essential text) */
+
+  /* Accent: selection + primary action */
+  --cf-accent: #1f3a5f;
+  --cf-accent-hover: #172c48;
+  --cf-accent-wash: #e6ecf4;     /* selected row background */
+  --cf-focus: #2f5d95;
+
+  /* Evidence highlighting */
+  --cf-evidence-selected: #fbe7a6;   /* filled highlight for selected fact spans */
+  --cf-evidence-preview: #fdf3d1;    /* hover preview from note line / chip */
+  --cf-evidence-pending: #b07a00;    /* dotted underline */
+  --cf-evidence-approved: #1c1d1f;   /* solid underline */
+
+  /* Status inks (always paired with glyph + word) */
+  --cf-status-approved: #2f6b3f;     --cf-status-approved-wash: #e7f1ea;
+  --cf-status-pending: #8a5a00;      --cf-status-pending-wash: #fbf1dc;
+  --cf-status-rejected: #6b6e75;     --cf-status-rejected-wash: #eeeeec;
+  --cf-status-satisfied: #2f6b3f;
+  --cf-status-missing: #5c5f66;      /* neutral: absence is not an error */
+  --cf-status-review: #8a5a00;
+  --cf-status-notmet: #9b2c2c;       --cf-status-notmet-wash: #f6e6e4;
+
+  /* Type */
+  --cf-font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --cf-font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --cf-text-xs: 12px;  --cf-text-sm: 13px;  --cf-text-base: 14px;  --cf-text-md: 16px;  --cf-text-lg: 20px;
+  --cf-leading-tight: 1.3;  --cf-leading-body: 1.5;  --cf-leading-transcript: 1.65;
+
+  /* Space (4px grid) */
+  --cf-space-1: 4px; --cf-space-2: 8px; --cf-space-3: 12px; --cf-space-4: 16px; --cf-space-6: 24px; --cf-space-8: 32px;
+
+  /* Shape & layout */
+  --cf-radius: 4px;
+  --cf-header-h: 48px;
+  --cf-rail-h: 44px;
+  --cf-row-h: 40px;
+  --cf-drawer-w: 420px;
+  --cf-shadow-pop: 0 4px 16px rgb(28 29 31 / 0.12);  /* popovers + drawer only */
+
+  /* Motion */
+  --cf-duration-fast: 120ms;
+  --cf-duration-pulse: 600ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --cf-duration-fast: 0ms; --cf-duration-pulse: 0ms; }
+}

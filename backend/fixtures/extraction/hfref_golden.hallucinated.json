@@ -1,0 +1,115 @@
+{
+  "schema_version": "cardioflow.extraction.v1",
+  "facts": [
+    {
+      "fact_type": "lvef",
+      "value": {
+        "percent": 25,
+        "percent_upper": null,
+        "measured_on_text": "June 12th",
+        "modality": "echocardiogram"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s16",
+          "quote": "an ejection fraction of 25 percent"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "nyha_class",
+      "value": {
+        "nyha": "II",
+        "nyha_upper": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s2",
+          "quote": "I'd put you at NYHA class III today"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "cardiac_rhythm",
+      "value": {
+        "rhythm": "sinus",
+        "source": "ecg"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s99",
+          "quote": "normal sinus rhythm"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "resting_heart_rate",
+      "value": {
+        "bpm": 72
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s7",
+          "quote": "heart rate 78 sitting"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "condition_history",
+      "value": {
+        "condition": "atrial_fibrillation",
+        "timing_text": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s20",
+          "quote": "Have you ever been told you have atrial fibrillation or an irregular heartbeat?"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "blood_pressure",
+      "value": {
+        "systolic": 112,
+        "diastolic": 70
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s7",
+          "quote": "blood pressure 112  over 70"
+        },
+        {
+          "segment_id": "s7",
+          "quote": "BP 112/70"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "beta_blocker_dose_status",
+      "value": {
+        "status": "at_max_tolerated_dose"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s18",
+          "quote": "you're already on the maximum dose of metoprolol"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician states beta-blocker is at maximum dose."
+    }
+  ]
+}

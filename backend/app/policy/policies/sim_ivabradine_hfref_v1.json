@@ -1,0 +1,84 @@
+{
+  "id": "sim-ivabradine-hfref",
+  "version": "1.0.0",
+  "simulated": true,
+  "display_name": "Ivabradine for chronic HFrEF — demonstration criteria",
+  "payer_display": "Simulated Demonstration Plan (not a real insurer)",
+  "disclaimer": "SIMULATED POLICY. Written for CardioFlow demonstration only. Loosely modeled on the general shape of published ivabradine indication criteria; it does not reproduce, represent, or predict any real insurer's coverage policy and must not be used for clinical or coverage decisions.",
+  "medication": "ivabradine",
+  "indication_text": "Stable, symptomatic chronic heart failure with reduced ejection fraction in sinus rhythm with elevated resting heart rate despite beta-blocker optimization.",
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Requested medication documented",
+      "policy_text": "Encounter documents a decided plan to start ivabradine.",
+      "evaluator": "requested_medication",
+      "params": {"drug": "ivabradine"},
+      "fact_types": ["medication"]
+    },
+    {
+      "id": "R2",
+      "title": "Prescribed by cardiology",
+      "policy_text": "Prescriber specialty is cardiology.",
+      "evaluator": "context_specialty",
+      "params": {"specialty": "cardiology"},
+      "fact_types": []
+    },
+    {
+      "id": "R3",
+      "title": "Chronic HFrEF diagnosis",
+      "policy_text": "Diagnosis of chronic heart failure with reduced ejection fraction.",
+      "evaluator": "hf_diagnosis",
+      "params": {"hf_type": "hfref", "chronicity": "chronic"},
+      "fact_types": ["hf_diagnosis"]
+    },
+    {
+      "id": "R4",
+      "title": "LVEF ≤ 35% within 12 months",
+      "policy_text": "Left ventricular ejection fraction of 35% or less, measured within 365 days before the encounter.",
+      "evaluator": "lvef_at_most",
+      "params": {"max_percent": 35, "max_age_days": 365},
+      "fact_types": ["lvef"]
+    },
+    {
+      "id": "R5",
+      "title": "NYHA class II–III",
+      "policy_text": "Symptomatic heart failure, NYHA functional class II or III.",
+      "evaluator": "nyha_in",
+      "params": {"allowed": ["II", "III"], "review_if": ["IV"]},
+      "fact_types": ["nyha_class"]
+    },
+    {
+      "id": "R6",
+      "title": "Sinus rhythm documented",
+      "policy_text": "Sinus rhythm documented by ECG or monitor at this encounter; no atrial fibrillation.",
+      "evaluator": "sinus_rhythm",
+      "params": {"accepted_sources": ["ecg", "monitor"]},
+      "fact_types": ["cardiac_rhythm", "condition_history"]
+    },
+    {
+      "id": "R7",
+      "title": "Resting heart rate ≥ 70 bpm",
+      "policy_text": "Resting heart rate of 70 beats per minute or higher.",
+      "evaluator": "heart_rate_at_least",
+      "params": {"min_bpm": 70},
+      "fact_types": ["resting_heart_rate"]
+    },
+    {
+      "id": "R8",
+      "title": "Beta-blocker optimized",
+      "policy_text": "On maximally tolerated beta-blocker dose, or beta-blocker contraindicated or not tolerated.",
+      "evaluator": "beta_blocker_optimized",
+      "params": {},
+      "fact_types": ["beta_blocker_dose_status", "medication"]
+    },
+    {
+      "id": "R9",
+      "title": "No hypotension",
+      "policy_text": "Blood pressure at or above 90/50 mmHg.",
+      "evaluator": "blood_pressure_at_least",
+      "params": {"min_systolic": 90, "min_diastolic": 50},
+      "fact_types": ["blood_pressure"]
+    }
+  ]
+}

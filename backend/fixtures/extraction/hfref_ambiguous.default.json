@@ -1,0 +1,176 @@
+{
+  "schema_version": "cardioflow.extraction.v1",
+  "facts": [
+    {
+      "fact_type": "lvef",
+      "value": {
+        "percent": 20,
+        "percent_upper": 25,
+        "measured_on_text": null,
+        "modality": "unspecified"
+      },
+      "assertion": "uncertain",
+      "evidence": [
+        {
+          "segment_id": "s2",
+          "quote": "my heart was pumping at like twenty percent. Or maybe twenty-five"
+        }
+      ],
+      "model_confidence": "low",
+      "rationale": "Patient recalls an outside value; no report available."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {
+        "symptom": "dyspnea_on_exertion",
+        "detail_text": "Walking to the mailbox"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s5",
+          "quote": "I get short of breath walking out to the mailbox"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Patient describes exertional dyspnea."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {
+        "symptom": "fatigue",
+        "detail_text": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s5",
+          "quote": "I'm tired all the time"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Patient reports fatigue."
+    },
+    {
+      "fact_type": "blood_pressure",
+      "value": {
+        "systolic": 94,
+        "diastolic": 58
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s6",
+          "quote": "Blood pressure 94 over 58"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "MA-recorded vital sign."
+    },
+    {
+      "fact_type": "resting_heart_rate",
+      "value": {
+        "bpm": 88
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s6",
+          "quote": "I counted about 88"
+        }
+      ],
+      "model_confidence": "medium",
+      "rationale": "Manual pulse count, approximate."
+    },
+    {
+      "fact_type": "condition_history",
+      "value": {
+        "condition": "atrial_fibrillation",
+        "timing_text": "Mentioned during April hospitalization"
+      },
+      "assertion": "uncertain",
+      "evidence": [
+        {
+          "segment_id": "s7",
+          "quote": "Has anyone ever told you that you have atrial fibrillation?"
+        },
+        {
+          "segment_id": "s8",
+          "quote": "I think they said something about that in the hospital, but I'm not sure."
+        }
+      ],
+      "model_confidence": "low",
+      "rationale": "Patient unsure whether AF was diagnosed."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "carvedilol",
+        "raw_name": "carvedilol",
+        "dose_value": 12.5,
+        "dose_unit": null,
+        "dose_text": "12.5",
+        "frequency": "unspecified",
+        "status": "active",
+        "adherence_note": "Reports skipping the evening dose because of fatigue"
+      },
+      "assertion": "uncertain",
+      "evidence": [
+        {
+          "segment_id": "s10",
+          "quote": "The carvedilol, I think it's the 12.5."
+        },
+        {
+          "segment_id": "s10",
+          "quote": "I've been skipping the night one because it makes me so tired."
+        }
+      ],
+      "model_confidence": "medium",
+      "rationale": "Patient unsure of dose; reports missed doses."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "other",
+        "raw_name": "water pill (name not recalled)",
+        "dose_value": null,
+        "dose_unit": null,
+        "dose_text": null,
+        "frequency": "unspecified",
+        "status": "active",
+        "adherence_note": null
+      },
+      "assertion": "uncertain",
+      "evidence": [
+        {
+          "segment_id": "s11",
+          "quote": "And a water pill. I don't remember the name."
+        }
+      ],
+      "model_confidence": "low",
+      "rationale": "Unnamed diuretic."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "ivabradine",
+        "raw_name": "ivabradine",
+        "dose_value": null,
+        "dose_unit": null,
+        "dose_text": null,
+        "frequency": "unspecified",
+        "status": "planned",
+        "adherence_note": null
+      },
+      "assertion": "hypothetical",
+      "evidence": [
+        {
+          "segment_id": "s13",
+          "quote": "ivabradine might be something to consider down the road"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Mentioned as a future possibility, not a decision."
+    }
+  ]
+}

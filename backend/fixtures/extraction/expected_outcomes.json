@@ -1,0 +1,106 @@
+{
+  "_readme": "Machine-readable expectations for pipeline + rule-engine tests. 'label' identifies a fact inside a type (drug or symptom/condition name). Flags are the complete set expected; order irrelevant. Mock scenario files: <fixture_id>.<scenario>.json|txt.",
+  "hfref_golden": {
+    "default": {
+      "run_status": "succeeded",
+      "issues": [],
+      "accepted_by_type": {
+        "hf_diagnosis": 1, "lvef": 1, "nyha_class": 1, "resting_heart_rate": 1, "blood_pressure": 1,
+        "cardiac_rhythm": 1, "medication": 6, "beta_blocker_dose_status": 1, "condition_history": 1, "symptom": 4
+      },
+      "flags": {
+        "symptom:dizziness": ["hedged_language", "uncertain_or_hypothetical"],
+        "*": []
+      },
+      "requirements_with_nothing_approved": {
+        "overall": "INCOMPLETE",
+        "R1": "MISSING", "R2": "SATISFIED", "R3": "MISSING", "R4": "MISSING", "R5": "MISSING",
+        "R6": "MISSING", "R7": "MISSING", "R8": "MISSING", "R9": "MISSING"
+      },
+      "requirements_after_approve_all": {
+        "R1": "SATISFIED", "R2": "SATISFIED", "R3": "SATISFIED", "R4": "SATISFIED", "R5": "SATISFIED",
+        "R6": "SATISFIED", "R7": "SATISFIED", "R8": "SATISFIED", "R9": "SATISFIED"
+      },
+      "overall_after_approve_all": "READY",
+      "reevaluation_scenarios": [
+        {"action": "approve_with_edit", "target": "resting_heart_rate", "value": {"bpm": 64}, "expect": {"R7": "NOT_MET", "overall": "NOT_MET"}},
+        {"action": "approve_with_edit", "target": "lvef", "value": {"percent": 30, "percent_upper": null, "measured_on_text": "June 12th", "modality": "echocardiogram"}, "assertion": "uncertain", "expect": {"R4": "REQUIRES_REVIEW", "overall": "NEEDS_REVIEW"}},
+        {"action": "reject", "target": "cardiac_rhythm", "expect": {"R6": "MISSING", "overall": "INCOMPLETE"}},
+        {"action": "reopen", "target": "beta_blocker_dose_status", "expect": {"R8": "REQUIRES_REVIEW", "overall": "NEEDS_REVIEW", "_why": "metoprolol succinate still approved+active, status fact now pending"}},
+        {"action": "approve_with_edit", "target": "lvef", "value": {"percent": 30, "percent_upper": null, "measured_on_text": "June 12th, 2025", "modality": "echocardiogram"}, "expect": {"R4": "NOT_MET", "_why": "resolved date 2025-06-12 is 418 days before 2026-08-04"}},
+        {"action": "approve_with_edit", "target": "lvef", "value": {"percent": 30, "percent_upper": null, "measured_on_text": null, "modality": "echocardiogram"}, "expect": {"R4": "REQUIRES_REVIEW", "_why": "measurement date not documented"}}
+      ]
+    },
+    "invalid_json": {
+      "run_status": "failed",
+      "issues": ["invalid_json"],
+      "accepted_by_type": {}
+    },
+    "envelope_invalid": {
+      "run_status": "failed",
+      "issues": ["envelope_invalid"],
+      "accepted_by_type": {}
+    },
+    "item_errors": {
+      "run_status": "succeeded_with_issues",
+      "issues": ["item_invalid", "item_invalid", "item_invalid", "disallowed_assertion"],
+      "accepted_by_type": {"lvef": 1}
+    },
+    "hallucinated": {
+      "run_status": "succeeded_with_issues",
+      "issues": ["quote_not_found", "ungrounded_fact", "quote_not_found", "ungrounded_fact", "unknown_segment", "ungrounded_fact", "quote_not_found"],
+      "accepted_by_type": {"resting_heart_rate": 1, "condition_history": 1, "blood_pressure": 1, "beta_blocker_dose_status": 1},
+      "flags": {
+        "resting_heart_rate": ["value_not_in_evidence"],
+        "condition_history:atrial_fibrillation": ["evidence_is_question"],
+        "blood_pressure": [],
+        "beta_blocker_dose_status": []
+      },
+      "evidence_notes": {
+        "blood_pressure": "First quote 'blood pressure 112  over 70' matches after case/whitespace normalization; stored span is s7[15:41] with the ORIGINAL text 'Blood pressure 112 over 70'. Second quote 'BP 112/70' is dropped (quote_not_found). Fact keeps 1 span."
+      }
+    }
+  },
+  "gerd_simulated": {
+    "default": {
+      "accepted_by_type": {
+        "condition_history": 1,
+        "symptom": 6,
+        "medication": 1
+      }
+    }
+  },
+  "hfref_ambiguous": {
+    "default": {
+      "run_status": "succeeded",
+      "issues": [],
+      "accepted_by_type": {
+        "lvef": 1, "symptom": 2, "blood_pressure": 1, "resting_heart_rate": 1, "condition_history": 1, "medication": 3
+      },
+      "must_not_extract": ["nyha_class", "cardiac_rhythm", "hf_diagnosis", "beta_blocker_dose_status"],
+      "flags": {
+        "lvef": ["hedged_language", "patient_reported_measurement", "model_low_confidence", "uncertain_or_hypothetical"],
+        "resting_heart_rate": ["hedged_language"],
+        "condition_history:atrial_fibrillation": ["hedged_language", "model_low_confidence", "uncertain_or_hypothetical"],
+        "medication:carvedilol": ["hedged_language", "uncertain_or_hypothetical"],
+        "medication:other": ["hedged_language", "model_low_confidence", "uncertain_or_hypothetical"],
+        "medication:ivabradine": ["hedged_language", "uncertain_or_hypothetical"],
+        "symptom:dyspnea_on_exertion": [],
+        "symptom:fatigue": [],
+        "blood_pressure": []
+      },
+      "requirements_after_approve_all": {
+        "R1": "REQUIRES_REVIEW", "R2": "SATISFIED", "R3": "MISSING", "R4": "REQUIRES_REVIEW", "R5": "MISSING",
+        "R6": "MISSING", "R7": "SATISFIED", "R8": "REQUIRES_REVIEW", "R9": "SATISFIED"
+      },
+      "overall_after_approve_all": "INCOMPLETE",
+      "resolution_scenario": {
+        "_story": "Clinician obtains outside echo + orders ECG, then adds facts from the chart. Readiness must still NOT become READY because ivabradine is hypothetical and beta-blocker optimization is undocumented.",
+        "steps": [
+          {"action": "add_fact", "fact_type": "cardiac_rhythm", "value": {"rhythm": "atrial_fibrillation", "source": "ecg"}, "attestation_note": "In-clinic ECG reviewed after visit"}
+        ],
+        "expect": {"R6": "NOT_MET", "overall": "NOT_MET"}
+      }
+    }
+  }
+}

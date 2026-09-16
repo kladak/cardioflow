@@ -1,0 +1,84 @@
+{
+  "schema_version": "cardioflow.extraction.v1",
+  "facts": [
+    {
+      "fact_type": "lvef",
+      "value": {
+        "percent": 30,
+        "percent_upper": null,
+        "measured_on_text": "June 12th",
+        "modality": "echocardiogram"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s16",
+          "quote": "Your echo from June 12th showed an ejection fraction of 30 percent"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician reports echo result."
+    },
+    {
+      "fact_type": "nyha_class",
+      "value": {
+        "nyha": "3"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s19",
+          "quote": "I'd put you at NYHA class III today"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "resting_heart_rate",
+      "value": {
+        "bpm": 78
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s7",
+          "quote": "heart rate 78 sitting"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "MA-recorded vital sign.",
+      "icd10": "I50.22"
+    },
+    {
+      "fact_type": "ejection_fraction",
+      "value": {
+        "percent": 30
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s16",
+          "quote": "ejection fraction of 30 percent"
+        }
+      ],
+      "model_confidence": "high"
+    },
+    {
+      "fact_type": "lvef",
+      "value": {
+        "percent": 30,
+        "percent_upper": null,
+        "measured_on_text": null,
+        "modality": "echocardiogram"
+      },
+      "assertion": "negated",
+      "evidence": [
+        {
+          "segment_id": "s16",
+          "quote": "ejection fraction of 30 percent"
+        }
+      ],
+      "model_confidence": "high"
+    }
+  ]
+}

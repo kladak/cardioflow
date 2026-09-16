@@ -1,0 +1,41 @@
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Python caches, packaging, and coverage
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Local application data
+data/
+backend/data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Frontend dependencies and generated output
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+frontend/openapi.json
+coverage/
+e2e/test-results/
+e2e/playwright-report/
+
+# Editor, operating-system, and log artifacts
+.DS_Store
+*.log
+.idea/
+.vscode/

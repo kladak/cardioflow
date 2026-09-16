@@ -1,0 +1,39 @@
+{
+  "fixture_id": "hfref_ambiguous",
+  "title": "New patient — outside records pending",
+  "description": "Adversarial fixture. LVEF is patient-reported and hedged, no ECG, no NYHA class, heart-failure type never stated, AF history uncertain, beta-blocker adherence poor, unnamed diuretic, ivabradine only mentioned as a possibility.",
+  "purpose": "adversarial",
+  "synthetic_notice": "Entirely fictional. Not derived from any real patient or encounter.",
+  "patient": {
+    "synthetic_mrn": "SYN-000287",
+    "given_name": "Nora",
+    "family_name": "Lindqvist",
+    "birth_date": "1954-11-02",
+    "administrative_gender": "female",
+    "synthetic": true
+  },
+  "context": {
+    "encounter_date": "2026-08-06",
+    "specialty": "cardiology",
+    "visit_type": "New patient consultation",
+    "clinician_display": "Dr. A. Reyes",
+    "location_display": "Demo Cardiology Clinic",
+    "fixture_id": "hfref_ambiguous"
+  },
+  "segments": [
+    {"id": "s1", "seq": 1, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Hi Mrs. Lindqvist, I'm Dr. Reyes. I understand you were in the hospital in Tucson this spring for your heart."},
+    {"id": "s2", "seq": 2, "speaker": "patient", "speaker_label": "N. Lindqvist", "text": "Yes, in April. The doctor there said my heart was pumping at like twenty percent. Or maybe twenty-five, I don't remember exactly."},
+    {"id": "s3", "seq": 3, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "We don't have that echo report yet. We'll request the records from Tucson."},
+    {"id": "s4", "seq": 4, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "How is your breathing day to day?"},
+    {"id": "s5", "seq": 5, "speaker": "patient", "speaker_label": "N. Lindqvist", "text": "I get short of breath walking out to the mailbox. And I'm tired all the time."},
+    {"id": "s6", "seq": 6, "speaker": "staff", "speaker_label": "J. Park, MA", "text": "Blood pressure 94 over 58. Pulse felt a little irregular, I counted about 88."},
+    {"id": "s7", "seq": 7, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Has anyone ever told you that you have atrial fibrillation?"},
+    {"id": "s8", "seq": 8, "speaker": "patient", "speaker_label": "N. Lindqvist", "text": "I think they said something about that in the hospital, but I'm not sure. They gave me a lot of papers."},
+    {"id": "s9", "seq": 9, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "What medications are you taking right now?"},
+    {"id": "s10", "seq": 10, "speaker": "patient", "speaker_label": "N. Lindqvist", "text": "The carvedilol, I think it's the 12.5. But I've been skipping the night one because it makes me so tired."},
+    {"id": "s11", "seq": 11, "speaker": "patient", "speaker_label": "N. Lindqvist", "text": "And a water pill. I don't remember the name. It's in my bag somewhere."},
+    {"id": "s12", "seq": 12, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "That's okay, we'll go through the bottles before you leave."},
+    {"id": "s13", "seq": 13, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Before we change anything, I want an ECG and those outside records. If your rhythm is regular and your heart rate stays up once you're taking the carvedilol consistently, ivabradine might be something to consider down the road."},
+    {"id": "s14", "seq": 14, "speaker": "patient", "speaker_label": "N. Lindqvist", "text": "Okay. Whatever you think is best."}
+  ]
+}

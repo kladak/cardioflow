@@ -1,0 +1,33 @@
+{
+  "fixture_id": "gerd_simulated",
+  "title": "GERD consultation — synthetic simulation",
+  "description": "A fictional gastroenterology consultation with symptom review, medication reconciliation, evidence grounding, clinician verification, note generation, and structured export.",
+  "purpose": "simulation",
+  "synthetic_notice": "Entirely fictional. Not derived from any real patient or encounter.",
+  "patient": {
+    "synthetic_mrn": "SYN-000318",
+    "given_name": "Maya",
+    "family_name": "Chen",
+    "birth_date": "1988-11-23",
+    "administrative_gender": "female",
+    "synthetic": true
+  },
+  "context": {
+    "encounter_date": "2026-08-18",
+    "specialty": "gastroenterology",
+    "visit_type": "Reflux symptom consultation",
+    "clinician_display": "Dr. N. Patel",
+    "location_display": "Demo Gastroenterology Clinic",
+    "fixture_id": "gerd_simulated"
+  },
+  "segments": [
+    {"id": "s1", "seq": 1, "speaker": "clinician", "speaker_label": "Dr. Patel", "text": "What symptoms brought you in today?"},
+    {"id": "s2", "seq": 2, "speaker": "patient", "speaker_label": "M. Chen", "text": "I get a burning feeling behind my breastbone after dinner three or four nights a week, especially after a late meal."},
+    {"id": "s3", "seq": 3, "speaker": "patient", "speaker_label": "M. Chen", "text": "Sometimes I also get a sour taste coming back into my mouth when I lie down."},
+    {"id": "s4", "seq": 4, "speaker": "clinician", "speaker_label": "Dr. Patel", "text": "Any trouble swallowing, vomiting blood, black stools, or weight loss you did not intend?"},
+    {"id": "s5", "seq": 5, "speaker": "patient", "speaker_label": "M. Chen", "text": "No trouble swallowing, no vomiting blood, no black stools, and my weight has been steady."},
+    {"id": "s6", "seq": 6, "speaker": "clinician", "speaker_label": "Dr. Patel", "text": "Are you still taking omeprazole 20 milligrams each morning?"},
+    {"id": "s7", "seq": 7, "speaker": "patient", "speaker_label": "M. Chen", "text": "Yes. It helps most days, but I still get breakthrough burning after late meals."},
+    {"id": "s8", "seq": 8, "speaker": "clinician", "speaker_label": "Dr. Patel", "text": "Your symptom pattern is consistent with gastroesophageal reflux disease. Continue omeprazole 20 milligrams daily, and we will review your response at follow-up."}
+  ]
+}

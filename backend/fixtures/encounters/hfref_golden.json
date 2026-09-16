@@ -1,0 +1,51 @@
+{
+  "fixture_id": "hfref_golden",
+  "title": "HFrEF follow-up — ivabradine start",
+  "description": "Chronic HFrEF on optimized GDMT with persistent resting tachycardia. Clinician starts ivabradine. Every simulated policy criterion is stated in the transcript.",
+  "purpose": "golden",
+  "synthetic_notice": "Entirely fictional. Not derived from any real patient or encounter.",
+  "patient": {
+    "synthetic_mrn": "SYN-000142",
+    "given_name": "Ellis",
+    "family_name": "Varga",
+    "birth_date": "1961-03-14",
+    "administrative_gender": "male",
+    "synthetic": true
+  },
+  "context": {
+    "encounter_date": "2026-08-04",
+    "specialty": "cardiology",
+    "visit_type": "Heart failure follow-up",
+    "clinician_display": "Dr. A. Reyes",
+    "location_display": "Demo Cardiology Clinic",
+    "fixture_id": "hfref_golden"
+  },
+  "segments": [
+    {"id": "s1", "seq": 1, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Good morning, Mr. Varga. Last time I saw you was right after your hospital stay in March. How have things been since then?"},
+    {"id": "s2", "seq": 2, "speaker": "patient", "speaker_label": "E. Varga", "text": "Better than March, for sure. But I still get winded going up the stairs at home. I have to stop halfway up, every time."},
+    {"id": "s3", "seq": 3, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Any trouble breathing when you lie flat? Waking up at night short of breath?"},
+    {"id": "s4", "seq": 4, "speaker": "patient", "speaker_label": "E. Varga", "text": "No, I sleep on one pillow. That part is fine."},
+    {"id": "s5", "seq": 5, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "How about swelling in your ankles?"},
+    {"id": "s6", "seq": 6, "speaker": "patient", "speaker_label": "E. Varga", "text": "A little by the end of the day. It's gone by the morning."},
+    {"id": "s7", "seq": 7, "speaker": "staff", "speaker_label": "M. Ortiz, MA", "text": "Vitals are in. Blood pressure 112 over 70, heart rate 78 sitting, weight 196 pounds, oxygen 97 percent on room air."},
+    {"id": "s8", "seq": 8, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Thank you. Let's go through your medications. Metoprolol succinate 200 milligrams once a day?"},
+    {"id": "s9", "seq": 9, "speaker": "patient", "speaker_label": "E. Varga", "text": "Yes, every morning."},
+    {"id": "s10", "seq": 10, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Entresto 49/51, twice a day?"},
+    {"id": "s11", "seq": 11, "speaker": "patient", "speaker_label": "E. Varga", "text": "Twice a day, yes."},
+    {"id": "s12", "seq": 12, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Spironolactone 25 milligrams daily and Farxiga 10 milligrams daily?"},
+    {"id": "s13", "seq": 13, "speaker": "patient", "speaker_label": "E. Varga", "text": "Both of those. And the furosemide 40 in the morning."},
+    {"id": "s14", "seq": 14, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Any dizziness when you stand up?"},
+    {"id": "s15", "seq": 15, "speaker": "patient", "speaker_label": "E. Varga", "text": "Not really. Maybe once last week when I got up too fast."},
+    {"id": "s16", "seq": 16, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Your echo from June 12th showed an ejection fraction of 30 percent, about where it was in the hospital. The ECG we did today shows normal sinus rhythm."},
+    {"id": "s17", "seq": 17, "speaker": "patient", "speaker_label": "E. Varga", "text": "So it hasn't gotten better."},
+    {"id": "s18", "seq": 18, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Not yet. Your chronic heart failure with reduced ejection fraction is stable, but your heart rate is still in the upper 70s, and you're already on the maximum dose of metoprolol, so I don't want to push it any further."},
+    {"id": "s19", "seq": 19, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Functionally I'd put you at NYHA class III today. You're comfortable at rest, but less than ordinary activity, like one flight of stairs, brings on symptoms."},
+    {"id": "s20", "seq": 20, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Have you ever been told you have atrial fibrillation or an irregular heartbeat?"},
+    {"id": "s21", "seq": 21, "speaker": "patient", "speaker_label": "E. Varga", "text": "No, nobody has ever said that to me."},
+    {"id": "s22", "seq": 22, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Good. There's a medication called ivabradine that slows the heart rate for people in normal rhythm. It can lower the chance of ending up back in the hospital."},
+    {"id": "s23", "seq": 23, "speaker": "patient", "speaker_label": "E. Varga", "text": "Another pill twice a day?"},
+    {"id": "s24", "seq": 24, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Twice a day. I'm going to start you on ivabradine 5 milligrams twice daily, and we'll recheck your heart rate in two weeks."},
+    {"id": "s25", "seq": 25, "speaker": "clinician", "speaker_label": "Dr. Reyes", "text": "Your insurance will likely need paperwork for this one, so our team will send that in. Keep taking everything else the same."},
+    {"id": "s26", "seq": 26, "speaker": "patient", "speaker_label": "E. Varga", "text": "Okay. Same as before, plus the new one once it's approved."}
+  ]
+}

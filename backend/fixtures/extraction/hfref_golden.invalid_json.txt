@@ -1,0 +1,3 @@
+Here are the extracted facts:
+```json
+{"schema_version": "cardioflow.extraction.v1", "facts": [{"fact_type": "lvef", "value": {"percent": 30, "measured_on_text": "June 12th", "modality": "echocardiogram"}, "assertion": "affirmed", "evidence": [{"segment_id": "s16", "quote": "an ejection fraction of 30 percent"}], "model_confidence": "hi

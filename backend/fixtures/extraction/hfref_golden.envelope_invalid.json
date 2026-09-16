@@ -1,0 +1,7 @@
+{
+  "schema_version": "cardioflow.extraction.v0",
+  "facts": {
+    "lvef": 30
+  },
+  "summary": "Patient has HFrEF."
+}

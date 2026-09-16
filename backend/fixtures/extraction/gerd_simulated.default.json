@@ -1,0 +1,72 @@
+{
+  "schema_version": "cardioflow.extraction.v1",
+  "facts": [
+    {
+      "fact_type": "condition_history",
+      "value": {"condition": "gastroesophageal_reflux_disease", "timing_text": "current consultation"},
+      "assertion": "affirmed",
+      "evidence": [{"segment_id": "s8", "quote": "consistent with gastroesophageal reflux disease"}],
+      "model_confidence": "high",
+      "rationale": "Clinician states the assessment explicitly."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {"symptom": "heartburn", "detail_text": "after dinner three or four nights a week"},
+      "assertion": "affirmed",
+      "evidence": [{"segment_id": "s2", "quote": "a burning feeling behind my breastbone after dinner three or four nights a week"}],
+      "model_confidence": "high",
+      "rationale": "Patient describes recurrent heartburn."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {"symptom": "acid_regurgitation", "detail_text": "when lying down"},
+      "assertion": "affirmed",
+      "evidence": [{"segment_id": "s3", "quote": "a sour taste coming back into my mouth when I lie down"}],
+      "model_confidence": "high",
+      "rationale": "Patient describes acid regurgitation."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {"symptom": "dysphagia", "detail_text": null},
+      "assertion": "negated",
+      "evidence": [{"segment_id": "s5", "quote": "No trouble swallowing"}],
+      "model_confidence": "high",
+      "rationale": "Patient explicitly denies dysphagia."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {"symptom": "hematemesis", "detail_text": null},
+      "assertion": "negated",
+      "evidence": [{"segment_id": "s5", "quote": "no vomiting blood"}],
+      "model_confidence": "high",
+      "rationale": "Patient explicitly denies hematemesis."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {"symptom": "melena", "detail_text": null},
+      "assertion": "negated",
+      "evidence": [{"segment_id": "s5", "quote": "no black stools"}],
+      "model_confidence": "high",
+      "rationale": "Patient explicitly denies melena."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {"symptom": "unintentional_weight_loss", "detail_text": "weight steady"},
+      "assertion": "negated",
+      "evidence": [{"segment_id": "s5", "quote": "my weight has been steady"}],
+      "model_confidence": "high",
+      "rationale": "Patient denies unintended weight loss."
+    },
+    {
+      "fact_type": "medication",
+      "value": {"drug": "other", "raw_name": "omeprazole", "dose_value": 20, "dose_unit": "mg", "dose_text": "20 milligrams", "frequency": "daily", "status": "active", "adherence_note": "Patient confirms current use"},
+      "assertion": "affirmed",
+      "evidence": [
+        {"segment_id": "s6", "quote": "omeprazole 20 milligrams each morning"},
+        {"segment_id": "s7", "quote": "Yes."}
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician reconciles the medication and the patient confirms use."
+    }
+  ]
+}

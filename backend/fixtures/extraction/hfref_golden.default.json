@@ -1,0 +1,357 @@
+{
+  "schema_version": "cardioflow.extraction.v1",
+  "facts": [
+    {
+      "fact_type": "hf_diagnosis",
+      "value": {
+        "hf_type": "hfref",
+        "chronicity": "chronic"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s18",
+          "quote": "chronic heart failure with reduced ejection fraction"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician names the diagnosis."
+    },
+    {
+      "fact_type": "lvef",
+      "value": {
+        "percent": 30,
+        "percent_upper": null,
+        "measured_on_text": "June 12th",
+        "modality": "echocardiogram"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s16",
+          "quote": "Your echo from June 12th showed an ejection fraction of 30 percent"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician reports echo result."
+    },
+    {
+      "fact_type": "nyha_class",
+      "value": {
+        "nyha": "III",
+        "nyha_upper": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s19",
+          "quote": "I'd put you at NYHA class III today"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician states NYHA class."
+    },
+    {
+      "fact_type": "resting_heart_rate",
+      "value": {
+        "bpm": 78
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s7",
+          "quote": "heart rate 78 sitting"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "MA-recorded vital sign."
+    },
+    {
+      "fact_type": "blood_pressure",
+      "value": {
+        "systolic": 112,
+        "diastolic": 70
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s7",
+          "quote": "Blood pressure 112 over 70"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "MA-recorded vital sign."
+    },
+    {
+      "fact_type": "cardiac_rhythm",
+      "value": {
+        "rhythm": "sinus",
+        "source": "ecg"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s16",
+          "quote": "The ECG we did today shows normal sinus rhythm"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician reads today's ECG."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "metoprolol_succinate",
+        "raw_name": "Metoprolol succinate",
+        "dose_value": 200,
+        "dose_unit": "mg",
+        "dose_text": "200 milligrams",
+        "frequency": "daily",
+        "status": "active",
+        "adherence_note": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s8",
+          "quote": "Metoprolol succinate 200 milligrams once a day"
+        },
+        {
+          "segment_id": "s9",
+          "quote": "Yes, every morning."
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician reconciles; patient confirms."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "sacubitril_valsartan",
+        "raw_name": "Entresto",
+        "dose_value": null,
+        "dose_unit": null,
+        "dose_text": "49/51",
+        "frequency": "bid",
+        "status": "active",
+        "adherence_note": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s10",
+          "quote": "Entresto 49/51, twice a day"
+        },
+        {
+          "segment_id": "s11",
+          "quote": "Twice a day, yes."
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Combination dose kept as spoken."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "spironolactone",
+        "raw_name": "Spironolactone",
+        "dose_value": 25,
+        "dose_unit": "mg",
+        "dose_text": "25 milligrams",
+        "frequency": "daily",
+        "status": "active",
+        "adherence_note": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s12",
+          "quote": "Spironolactone 25 milligrams daily"
+        },
+        {
+          "segment_id": "s13",
+          "quote": "Both of those."
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician reconciles; patient confirms."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "dapagliflozin",
+        "raw_name": "Farxiga",
+        "dose_value": 10,
+        "dose_unit": "mg",
+        "dose_text": "10 milligrams",
+        "frequency": "daily",
+        "status": "active",
+        "adherence_note": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s12",
+          "quote": "Farxiga 10 milligrams daily"
+        },
+        {
+          "segment_id": "s13",
+          "quote": "Both of those."
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Brand name spoken; mapped to ingredient."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "furosemide",
+        "raw_name": "furosemide",
+        "dose_value": 40,
+        "dose_unit": null,
+        "dose_text": "40",
+        "frequency": "daily",
+        "status": "active",
+        "adherence_note": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s13",
+          "quote": "the furosemide 40 in the morning"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Patient-reported; unit not stated."
+    },
+    {
+      "fact_type": "medication",
+      "value": {
+        "drug": "ivabradine",
+        "raw_name": "ivabradine",
+        "dose_value": 5,
+        "dose_unit": "mg",
+        "dose_text": "5 milligrams",
+        "frequency": "bid",
+        "status": "planned",
+        "adherence_note": null
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s24",
+          "quote": "I'm going to start you on ivabradine 5 milligrams twice daily"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician states decision to start."
+    },
+    {
+      "fact_type": "beta_blocker_dose_status",
+      "value": {
+        "status": "at_max_tolerated_dose"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s18",
+          "quote": "you're already on the maximum dose of metoprolol"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Clinician states beta-blocker is at maximum dose."
+    },
+    {
+      "fact_type": "condition_history",
+      "value": {
+        "condition": "atrial_fibrillation",
+        "timing_text": null
+      },
+      "assertion": "negated",
+      "evidence": [
+        {
+          "segment_id": "s20",
+          "quote": "Have you ever been told you have atrial fibrillation or an irregular heartbeat?"
+        },
+        {
+          "segment_id": "s21",
+          "quote": "No, nobody has ever said that to me."
+        }
+      ],
+      "model_confidence": "medium",
+      "rationale": "Patient denies prior AF diagnosis."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {
+        "symptom": "dyspnea_on_exertion",
+        "detail_text": "Stops halfway up a flight of stairs"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s2",
+          "quote": "I still get winded going up the stairs at home"
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Patient describes exertional dyspnea."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {
+        "symptom": "orthopnea",
+        "detail_text": null
+      },
+      "assertion": "negated",
+      "evidence": [
+        {
+          "segment_id": "s3",
+          "quote": "Any trouble breathing when you lie flat?"
+        },
+        {
+          "segment_id": "s4",
+          "quote": "No, I sleep on one pillow."
+        }
+      ],
+      "model_confidence": "high",
+      "rationale": "Patient denies orthopnea."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {
+        "symptom": "peripheral_edema",
+        "detail_text": "Mild ankle swelling by end of day, resolves overnight"
+      },
+      "assertion": "affirmed",
+      "evidence": [
+        {
+          "segment_id": "s5",
+          "quote": "swelling in your ankles"
+        },
+        {
+          "segment_id": "s6",
+          "quote": "A little by the end of the day."
+        }
+      ],
+      "model_confidence": "medium",
+      "rationale": "Patient reports mild evening edema."
+    },
+    {
+      "fact_type": "symptom",
+      "value": {
+        "symptom": "dizziness",
+        "detail_text": "Possibly once last week on standing quickly"
+      },
+      "assertion": "uncertain",
+      "evidence": [
+        {
+          "segment_id": "s15",
+          "quote": "Not really. Maybe once last week when I got up too fast."
+        }
+      ],
+      "model_confidence": "medium",
+      "rationale": "Hedged report of a single orthostatic episode."
+    }
+  ]
+}
