@@ -109,7 +109,7 @@ describe("CardioFlow landing workflow", () => {
     expect(push).not.toHaveBeenCalled();
   });
 
-  it("discloses the deterministic fallback and opens the GERD simulation", async () => {
+  it("opens the deterministic GERD simulation without implying custom generation", async () => {
     mockedApi.mockImplementation(async (path, init) => {
       if (path === "/api/fixtures") return fixtures as never;
       if (path === "/api/encounters" && !init) return [] as never;
@@ -117,19 +117,36 @@ describe("CardioFlow landing workflow", () => {
     });
 
     render(<Home />);
-    await screen.findByRole("button", { name: "Open simulated GERD encounter" });
-    fireEvent.click(screen.getByRole("button", { name: "Describe a scenario" }));
-
-    expect(screen.getByText(/Live transcript generation is not configured/)).toBeVisible();
-    fireEvent.change(screen.getByLabelText("Synthetic patient situation"), {
-      target: { value: "Burning after meals" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Open deterministic fallback" }));
+    const button = await screen.findByRole("button", { name: "Open simulated GERD encounter" });
+    fireEvent.click(button);
 
     await waitFor(() => expect(push).toHaveBeenCalledWith("/encounters/enc_gerd"));
     expect(mockedApi).toHaveBeenCalledWith(
       "/api/encounters",
       expect.objectContaining({ body: JSON.stringify({ fixture_id: "gerd_simulated" }) }),
     );
+  });
+
+  it("validates custom transcript format locally without sending transcript data", async () => {
+    mockedApi.mockImplementation(async (path) =>
+      (path === "/api/fixtures" ? fixtures : []) as never,
+    );
+
+    render(<Home />);
+    await screen.findByRole("button", { name: "Open guided HFrEF demo" });
+    fireEvent.click(screen.getByText("Check a custom synthetic transcript"));
+
+    expect(screen.getByText(/Arbitrary extraction is not available/)).toBeVisible();
+    expect(screen.getByText(/Do not enter real patient information/)).toBeVisible();
+    fireEvent.change(screen.getByLabelText("Synthetic transcript"), {
+      target: {
+        value:
+          "CLINICIAN: What brings you in today?\nPATIENT: This is fictional test content.",
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Check transcript format" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("Text was not sent or saved");
+    expect(mockedApi.mock.calls.filter(([, init]) => init)).toHaveLength(0);
   });
 });

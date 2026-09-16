@@ -1,6 +1,6 @@
 {
   "fixture_id": "hfref_ambiguous",
-  "title": "New patient — outside records pending",
+  "title": "New patient: outside records pending",
   "description": "Adversarial fixture. LVEF is patient-reported and hedged, no ECG, no NYHA class, heart-failure type never stated, AF history uncertain, beta-blocker adherence poor, unnamed diuretic, ivabradine only mentioned as a possibility.",
   "purpose": "adversarial",
   "synthetic_notice": "Entirely fictional. Not derived from any real patient or encounter.",

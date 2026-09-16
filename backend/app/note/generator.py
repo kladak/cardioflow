@@ -16,7 +16,7 @@ def generate(approved: list[ApprovedFactRef]) -> dict[NoteSectionKey, list[NoteL
         key = None
         if f.fact_type is FactType.SYMPTOM:
             label = v.symptom.replace("_", " ")
-            detail = f" — {v.detail_text}" if v.detail_text else ""
+            detail = f": {v.detail_text}" if v.detail_text else ""
             text = (
                 f"Denies {label}."
                 if f.approved.assertion is Assertion.NEGATED
@@ -39,7 +39,7 @@ def generate(approved: list[ApprovedFactRef]) -> dict[NoteSectionKey, list[NoteL
             text = f"Rhythm: {v.rhythm.replace('_', ' ')} ({v.source}).{suffix}"
             key = NoteSectionKey.OBJECTIVE
         elif f.fact_type is FactType.LVEF:
-            value = f"{v.percent}{'–' + str(v.percent_upper) if v.percent_upper else ''}%"
+            value = f"{v.percent}{' to ' + str(v.percent_upper) if v.percent_upper else ''}%"
             source = f"{v.modality.replace('_', ' ')}, {v.measured_on_text or 'date not stated'}"
             text = f"LVEF {value} ({source}).{suffix}"
             key = NoteSectionKey.OBJECTIVE

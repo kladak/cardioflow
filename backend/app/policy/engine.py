@@ -54,15 +54,16 @@ def evaluate(
         status = RequirementStatus.MISSING
         explanation = f"No approved documentation for {req.title.lower()}."
         if req.id == "R2":
+            specialty = str(req.params["specialty"])
             status = (
                 RequirementStatus.SATISFIED
-                if context.specialty == req.params["specialty"]
+                if context.specialty == specialty
                 else RequirementStatus.NOT_MET
             )
             explanation = (
-                "Encounter specialty is cardiology."
+                f"Encounter specialty is {specialty}."
                 if status is RequirementStatus.SATISFIED
-                else "Encounter specialty is not cardiology."
+                else f"Encounter specialty is not {specialty}."
             )
         elif req.id == "R1":
             refs = [
@@ -88,13 +89,15 @@ def evaluate(
                 f = refs[0]
                 used = [f.fact_id]
                 v = f.approved.value
+                required_hf_type = str(req.params["hf_type"])
+                required_chronicity = str(req.params["chronicity"])
                 if (
                     f.approved.assertion is not Assertion.AFFIRMED
                     or v.hf_type == "unspecified"
                     or v.chronicity in {"unspecified", "acute_on_chronic"}
                 ):
                     status = RequirementStatus.REQUIRES_REVIEW
-                elif v.hf_type != "hfref" or v.chronicity == "acute":
+                elif v.hf_type != required_hf_type or v.chronicity != required_chronicity:
                     status = RequirementStatus.NOT_MET
                 else:
                     status = RequirementStatus.SATISFIED
@@ -109,21 +112,26 @@ def evaluate(
                 f = refs[0]
                 used = [f.fact_id]
                 v = f.approved.value
+                max_percent = int(req.params["max_percent"])
+                max_age_days = int(req.params["max_age_days"])
                 resolved = resolve_spoken_date(v.measured_on_text, context.encounter_date)
                 patient = _patient_only(f)
                 if (
                     f.approved.assertion is not Assertion.AFFIRMED
                     or patient
                     or not resolved
-                    or (v.percent_upper is not None and v.percent_upper > 35)
+                    or (v.percent_upper is not None and v.percent_upper > max_percent)
                 ):
                     status = RequirementStatus.REQUIRES_REVIEW
-                elif v.percent > 35 or (context.encounter_date - resolved).days > 365:
+                elif v.percent > max_percent or (context.encounter_date - resolved).days > max_age_days:
                     status = RequirementStatus.NOT_MET
                 else:
                     status = RequirementStatus.SATISFIED
                 if status is RequirementStatus.SATISFIED:
-                    explanation = f"LVEF {v.percent}% ({v.modality}, {resolved.isoformat()}) is at or below 35%."
+                    explanation = (
+                        f"LVEF {v.percent}% ({v.modality}, {resolved.isoformat()}) "
+                        f"is at or below {max_percent}%."
+                    )
                 elif status is RequirementStatus.NOT_MET:
                     explanation = f"LVEF {v.percent}% or its measurement date does not meet the criterion."
                 else:
@@ -135,20 +143,22 @@ def evaluate(
                 used = [f.fact_id]
                 v = f.approved.value
                 vals = {v.nyha, v.nyha_upper} - {None}
+                allowed = set(req.params["allowed"])
+                review_if = set(req.params["review_if"])
                 if (
                     f.approved.assertion is not Assertion.AFFIRMED
-                    or "IV" in vals
+                    or bool(vals & review_if)
                     or len(vals & {"I"})
                     and len(vals) > 1
                 ):
                     status = RequirementStatus.REQUIRES_REVIEW
-                elif vals <= {"II", "III"}:
+                elif vals <= allowed:
                     status = RequirementStatus.SATISFIED
                 else:
                     status = RequirementStatus.NOT_MET
                 ordered = [item for item in ("I", "II", "III", "IV") if item in vals]
                 explanation = (
-                    f"NYHA class {'–'.join(ordered)} is documented."
+                    f"NYHA class {' to '.join(ordered)} is documented."
                     if status is RequirementStatus.SATISFIED
                     else "Approved NYHA class needs review or does not meet the criterion."
                 )
@@ -158,6 +168,7 @@ def evaluate(
                 f = refs[0]
                 used = [f.fact_id]
                 v = f.approved.value
+                accepted_sources = set(req.params["accepted_sources"])
                 hist = [
                     h
                     for h in by_type(FactType.CONDITION_HISTORY)
@@ -169,7 +180,7 @@ def evaluate(
                     f.approved.assertion is not Assertion.AFFIRMED
                     or _patient_only(f)
                     or v.rhythm == "other"
-                    or v.source not in {"ecg", "monitor"}
+                    or v.source not in accepted_sources
                     or hist
                 ):
                     status = RequirementStatus.REQUIRES_REVIEW
@@ -188,13 +199,14 @@ def evaluate(
                 f = refs[0]
                 used = [f.fact_id]
                 bpm = f.approved.value.bpm
+                min_bpm = int(req.params["min_bpm"])
                 if f.approved.assertion is not Assertion.AFFIRMED or _patient_only(f):
                     status = RequirementStatus.REQUIRES_REVIEW
                 else:
-                    status = RequirementStatus.SATISFIED if bpm >= 70 else RequirementStatus.NOT_MET
+                    status = RequirementStatus.SATISFIED if bpm >= min_bpm else RequirementStatus.NOT_MET
                 comparison = "at or above" if status is RequirementStatus.SATISFIED else "below"
                 explanation = (
-                    f"Resting heart rate {bpm} bpm is {comparison} 70 bpm."
+                    f"Resting heart rate {bpm} bpm is {comparison} {min_bpm} bpm."
                     if status is not RequirementStatus.REQUIRES_REVIEW
                     else "Resting heart rate needs review."
                 )
@@ -204,12 +216,13 @@ def evaluate(
                 f = refs[0]
                 used = [f.fact_id]
                 status_value = f.approved.value.status
+                accepted_statuses = set(req.params["accepted"])
                 if f.approved.assertion is not Assertion.AFFIRMED:
                     status = RequirementStatus.REQUIRES_REVIEW
-                elif status_value == "below_max_tolerated_dose":
-                    status = RequirementStatus.NOT_MET
-                else:
+                elif status_value in accepted_statuses:
                     status = RequirementStatus.SATISFIED
+                else:
+                    status = RequirementStatus.NOT_MET
                 explanation = (
                     "Beta-blocker optimization is documented."
                     if status is RequirementStatus.SATISFIED
@@ -232,17 +245,20 @@ def evaluate(
                 f = refs[0]
                 used = [f.fact_id]
                 v = f.approved.value
+                min_systolic = int(req.params["min_systolic"])
+                min_diastolic = int(req.params["min_diastolic"])
                 if f.approved.assertion is not Assertion.AFFIRMED or _patient_only(f):
                     status = RequirementStatus.REQUIRES_REVIEW
                 else:
                     status = (
                         RequirementStatus.SATISFIED
-                        if v.systolic >= 90 and v.diastolic >= 50
+                        if v.systolic >= min_systolic and v.diastolic >= min_diastolic
                         else RequirementStatus.NOT_MET
                     )
                 comparison = "at or above" if status is RequirementStatus.SATISFIED else "below"
                 explanation = (
-                    f"Blood pressure {v.systolic}/{v.diastolic} mmHg is {comparison} 90/50 mmHg."
+                    f"Blood pressure {v.systolic}/{v.diastolic} mmHg is {comparison} "
+                    f"{min_systolic}/{min_diastolic} mmHg."
                     if status is not RequirementStatus.REQUIRES_REVIEW
                     else "Blood pressure needs review."
                 )

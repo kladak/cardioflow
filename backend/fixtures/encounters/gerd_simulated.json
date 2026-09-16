@@ -1,6 +1,6 @@
 {
   "fixture_id": "gerd_simulated",
-  "title": "GERD consultation — synthetic simulation",
+  "title": "GERD consultation: synthetic simulation",
   "description": "A fictional gastroenterology consultation with symptom review, medication reconciliation, evidence grounding, clinician verification, note generation, and structured export.",
   "purpose": "simulation",
   "synthetic_notice": "Entirely fictional. Not derived from any real patient or encounter.",

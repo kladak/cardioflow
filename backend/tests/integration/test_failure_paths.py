@@ -55,6 +55,44 @@ def test_invalid_json_fails_safely_without_proposed_state(tmp_path: Path) -> Non
     assert view["export"]["can_export"] is False
 
 
+def test_proposed_and_rejected_findings_do_not_satisfy_authorization(tmp_path: Path) -> None:
+    client = TestClient(create_app(Settings(db_path=tmp_path / "review-boundary.db")))
+    view = create_and_extract(client, "hfref_golden")
+    heart_rate = next(fact for fact in view["facts"] if fact["fact_type"] == "resting_heart_rate")
+
+    proposed_result = next(
+        requirement for requirement in view["prior_auth"]["requirements"] if requirement["requirement_id"] == "R7"
+    )
+    assert proposed_result["status"] == "MISSING"
+    assert proposed_result["used_fact_ids"] == []
+    assert proposed_result["pending_fact_ids"] == [heart_rate["id"]]
+
+    response = client.post(
+        f"/api/encounters/{view['encounter']['id']}/facts/{heart_rate['id']}/review",
+        json={"expected_revision": view["encounter"]["revision"], "action": "approve"},
+    )
+    assert response.status_code == 200
+    view = response.json()
+    approved_result = next(
+        requirement for requirement in view["prior_auth"]["requirements"] if requirement["requirement_id"] == "R7"
+    )
+    assert approved_result["status"] == "SATISFIED"
+    assert approved_result["used_fact_ids"] == [heart_rate["id"]]
+
+    response = client.post(
+        f"/api/encounters/{view['encounter']['id']}/facts/{heart_rate['id']}/review",
+        json={"expected_revision": view["encounter"]["revision"], "action": "reject"},
+    )
+    assert response.status_code == 200
+    rejected_result = next(
+        requirement
+        for requirement in response.json()["prior_auth"]["requirements"]
+        if requirement["requirement_id"] == "R7"
+    )
+    assert rejected_result["status"] == "MISSING"
+    assert rejected_result["used_fact_ids"] == []
+
+
 def test_simulated_gerd_uses_review_note_and_export_without_invented_policy(tmp_path: Path) -> None:
     client = TestClient(create_app(Settings(db_path=tmp_path / "gerd.db")))
     view = create_and_extract(client, "gerd_simulated")
@@ -62,6 +100,7 @@ def test_simulated_gerd_uses_review_note_and_export_without_invented_policy(tmp_
     assert view["fact_counts"]["total"] == 8
     assert view["fact_counts"]["pending_flagged"] == 0
     assert view["encounter"]["context"]["specialty"] == "gastroenterology"
+    assert view["authorization_policy"] is None
 
     for fact in list(view["facts"]):
         response = client.post(

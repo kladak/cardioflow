@@ -41,6 +41,7 @@ def build_view(encounter: Encounter, provider: str = "mock") -> EncounterView:
     approved = approved_facts(encounter)
     pending = [(f.id, f.fact_type) for f in encounter.facts if f.review.status is ReviewStatus.PENDING]
     policy = load_policy()
+    authorization_applicable = encounter.context.fixture_id in {"hfref_golden", "hfref_ambiguous"}
     prior = evaluate(policy, approved, pending, encounter.context, encounter.review_revision)
     latest = encounter.exports[-1] if encounter.exports else None
     export_summary = (
@@ -158,6 +159,7 @@ def build_view(encounter: Encounter, provider: str = "mock") -> EncounterView:
         fact_counts=fc,
         note_sections=note,
         prior_auth=prior,
+        authorization_policy=policy if authorization_applicable else None,
         export=export,
     )
 

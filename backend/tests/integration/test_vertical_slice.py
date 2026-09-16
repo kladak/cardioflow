@@ -13,6 +13,8 @@ def test_I_API_1_through_I_FHIR_2_golden_vertical_slice(tmp_path: Path) -> None:
     assert response.status_code == 201
     view = response.json()
     encounter_id = view["encounter"]["id"]
+    assert view["authorization_policy"]["id"] == "sim-ivabradine-hfref"
+    assert len(view["authorization_policy"]["requirements"]) == 9
 
     response = client.post(
         f"/api/encounters/{encounter_id}/extraction-runs",
@@ -39,6 +41,11 @@ def test_I_API_1_through_I_FHIR_2_golden_vertical_slice(tmp_path: Path) -> None:
 
     assert view["prior_auth"]["overall"] == "READY"
     heart_rate = next(f for f in view["facts"] if f["fact_type"] == "resting_heart_rate")
+    heart_rate_result = next(r for r in view["prior_auth"]["requirements"] if r["requirement_id"] == "R7")
+    heart_rate_rule = next(r for r in view["authorization_policy"]["requirements"] if r["id"] == "R7")
+    assert heart_rate_result["used_fact_ids"] == [heart_rate["id"]]
+    assert heart_rate["approved"]["evidence"]
+    assert heart_rate_rule["criterion_sources"][0]["section"] == "1.1 Heart Failure in Adult Patients"
     original_evidence = heart_rate["candidate"]["evidence"]
     response = client.post(
         f"/api/encounters/{encounter_id}/facts/{heart_rate['id']}/review",

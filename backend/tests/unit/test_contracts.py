@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from app.domain.encounter import Encounter, EncounterContext, SyntheticPatient, Transcript
 from app.domain.facts import ALLOWED_ASSERTIONS, Assertion, FactType, parse_value
-from app.domain.policy import AuthorizationPolicy
+from app.domain.policy import AuthorizationPolicy, ProvenanceClassification
 from app.extraction.contract import ITEM_ADAPTER, ExtractionEnvelope, extraction_json_schema
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -95,6 +95,44 @@ def test_policy_loads_and_is_simulated() -> None:
     bad = json.loads((ROOT / "app/policy/policies/sim_ivabradine_hfref_v1.json").read_text()) | {"simulated": False}
     with pytest.raises(ValidationError):
         AuthorizationPolicy.model_validate(bad)
+
+
+def test_every_policy_requirement_has_explicit_provenance() -> None:
+    raw = json.loads((ROOT / "app/policy/policies/sim_ivabradine_hfref_v1.json").read_text())
+    policy = AuthorizationPolicy.model_validate(raw)
+    classifications = {requirement.id: requirement.provenance_classification for requirement in policy.requirements}
+
+    assert classifications == {
+        "R1": ProvenanceClassification.DEMO_RULE,
+        "R2": ProvenanceClassification.DEMO_RULE,
+        "R3": ProvenanceClassification.SUPPORTED,
+        "R4": ProvenanceClassification.DEMO_RULE,
+        "R5": ProvenanceClassification.SUPPORTED,
+        "R6": ProvenanceClassification.DEMO_RULE,
+        "R7": ProvenanceClassification.SUPPORTED,
+        "R8": ProvenanceClassification.SUPPORTED,
+        "R9": ProvenanceClassification.UNSUPPORTED,
+    }
+    assert not any(value is ProvenanceClassification.PAYER_SPECIFIC for value in classifications.values())
+    for requirement in policy.requirements:
+        assert requirement.operator
+        assert requirement.provenance_note
+        assert requirement.last_verified_at.isoformat() == "2026-09-16"
+        if requirement.provenance_classification is ProvenanceClassification.SUPPORTED:
+            assert requirement.criterion_sources
+            for source in requirement.criterion_sources:
+                assert source.title
+                assert source.organization
+                assert source.url.startswith("https://")
+                assert source.section
+                assert source.version_or_date
+
+
+def test_supported_policy_requirement_cannot_omit_authoritative_source() -> None:
+    raw = json.loads((ROOT / "app/policy/policies/sim_ivabradine_hfref_v1.json").read_text())
+    raw["requirements"][2]["criterion_sources"] = []
+    with pytest.raises(ValidationError):
+        AuthorizationPolicy.model_validate(raw)
 
 
 def test_expected_requirement_ids_match_policy() -> None:

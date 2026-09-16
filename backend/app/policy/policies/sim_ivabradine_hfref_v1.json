@@ -1,84 +1,210 @@
 {
   "id": "sim-ivabradine-hfref",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "simulated": true,
-  "display_name": "Ivabradine for chronic HFrEF — demonstration criteria",
-  "payer_display": "Simulated Demonstration Plan (not a real insurer)",
-  "disclaimer": "SIMULATED POLICY. Written for CardioFlow demonstration only. Loosely modeled on the general shape of published ivabradine indication criteria; it does not reproduce, represent, or predict any real insurer's coverage policy and must not be used for clinical or coverage decisions.",
+  "display_name": "Ivabradine documentation-readiness demonstration",
+  "payer_display": "CardioFlow demonstration rules",
+  "disclaimer": "This is a simulated documentation-readiness workflow. It does not reproduce a payer policy, determine coverage, or provide clinical guidance.",
   "medication": "ivabradine",
-  "indication_text": "Stable, symptomatic chronic heart failure with reduced ejection fraction in sinus rhythm with elevated resting heart rate despite beta-blocker optimization.",
+  "indication_text": "Stable, symptomatic chronic heart failure with reduced ejection fraction in sinus rhythm with an elevated resting heart rate while receiving a maximally tolerated beta-blocker dose or when beta-blocker therapy is contraindicated.",
   "requirements": [
     {
       "id": "R1",
       "title": "Requested medication documented",
-      "policy_text": "Encounter documents a decided plan to start ivabradine.",
+      "policy_text": "The encounter documents a decided plan to start ivabradine.",
       "evaluator": "requested_medication",
       "params": {"drug": "ivabradine"},
-      "fact_types": ["medication"]
+      "fact_types": ["medication"],
+      "operator": "documented",
+      "threshold": "decided plan to start ivabradine",
+      "unit": null,
+      "provenance_classification": "application_specific_demo_rule",
+      "provenance_note": "This check confirms that the synthetic encounter contains the requested medication. It is a CardioFlow workflow rule, not an FDA indication or payer requirement.",
+      "criterion_sources": [],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R2",
-      "title": "Prescribed by cardiology",
-      "policy_text": "Prescriber specialty is cardiology.",
+      "title": "Cardiology encounter",
+      "policy_text": "The encounter specialty is cardiology.",
       "evaluator": "context_specialty",
       "params": {"specialty": "cardiology"},
-      "fact_types": []
+      "fact_types": [],
+      "operator": "equals",
+      "threshold": "cardiology",
+      "unit": null,
+      "provenance_classification": "application_specific_demo_rule",
+      "provenance_note": "The current FDA label and the cited guideline do not require a cardiology prescriber. CardioFlow uses this rule to demonstrate evaluation of encounter context.",
+      "criterion_sources": [],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R3",
       "title": "Chronic HFrEF diagnosis",
-      "policy_text": "Diagnosis of chronic heart failure with reduced ejection fraction.",
+      "policy_text": "The approved diagnosis is stable, symptomatic chronic heart failure with reduced ejection fraction.",
       "evaluator": "hf_diagnosis",
       "params": {"hf_type": "hfref", "chronicity": "chronic"},
-      "fact_types": ["hf_diagnosis"]
+      "fact_types": ["hf_diagnosis"],
+      "operator": "equals",
+      "threshold": {"hf_type": "hfref", "chronicity": "chronic"},
+      "unit": null,
+      "provenance_classification": "supported_by_authoritative_source",
+      "provenance_note": "The FDA prescribing information identifies stable, symptomatic chronic heart failure with reduced left ventricular ejection fraction for the adult indication.",
+      "criterion_sources": [
+        {
+          "title": "CORLANOR (ivabradine) prescribing information",
+          "organization": "U.S. National Library of Medicine DailyMed",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=92018a65-38f6-45f7-91d4-a34921b81d0d",
+          "section": "1.1 Heart Failure in Adult Patients",
+          "version_or_date": "Revised August 2021; DailyMed updated November 10, 2025",
+          "source_type": "fda_prescribing_information"
+        }
+      ],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R4",
-      "title": "LVEF ≤ 35% within 12 months",
-      "policy_text": "Left ventricular ejection fraction of 35% or less, measured within 365 days before the encounter.",
+      "title": "LVEF at or below 35% within 12 months",
+      "policy_text": "The approved LVEF is 35% or less and was measured within 365 days before the encounter.",
       "evaluator": "lvef_at_most",
       "params": {"max_percent": 35, "max_age_days": 365},
-      "fact_types": ["lvef"]
+      "fact_types": ["lvef"],
+      "operator": "less_than_or_equal_with_max_age",
+      "threshold": {"max_percent": 35, "max_age_days": 365},
+      "unit": "percent and days",
+      "provenance_classification": "application_specific_demo_rule",
+      "provenance_note": "The FDA prescribing information supports the LVEF threshold. The 365-day documentation window is a CardioFlow demo rule and is not stated in that indication.",
+      "criterion_sources": [
+        {
+          "title": "CORLANOR (ivabradine) prescribing information",
+          "organization": "U.S. National Library of Medicine DailyMed",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=92018a65-38f6-45f7-91d4-a34921b81d0d",
+          "section": "1.1 Heart Failure in Adult Patients",
+          "version_or_date": "Revised August 2021; DailyMed updated November 10, 2025",
+          "source_type": "fda_prescribing_information"
+        }
+      ],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R5",
-      "title": "NYHA class II–III",
-      "policy_text": "Symptomatic heart failure, NYHA functional class II or III.",
+      "title": "NYHA class II or III",
+      "policy_text": "The approved functional class is NYHA class II or III.",
       "evaluator": "nyha_in",
       "params": {"allowed": ["II", "III"], "review_if": ["IV"]},
-      "fact_types": ["nyha_class"]
+      "fact_types": ["nyha_class"],
+      "operator": "one_of",
+      "threshold": ["II", "III"],
+      "unit": "NYHA class",
+      "provenance_classification": "supported_by_authoritative_source",
+      "provenance_note": "The 2022 AHA/ACC/HFSA guideline recommendation for ivabradine applies to symptomatic NYHA class II to III stable chronic HFrEF.",
+      "criterion_sources": [
+        {
+          "title": "2022 AHA/ACC/HFSA Guideline for the Management of Heart Failure",
+          "organization": "American Heart Association, American College of Cardiology, and Heart Failure Society of America",
+          "url": "https://professional.heart.org/-/media/832EA0F4E73948848612F228F7FA2D35.pdf",
+          "section": "Management of Stage C HF: Ivabradine",
+          "version_or_date": "Published April 1, 2022",
+          "source_type": "professional_guideline"
+        }
+      ],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R6",
       "title": "Sinus rhythm documented",
-      "policy_text": "Sinus rhythm documented by ECG or monitor at this encounter; no atrial fibrillation.",
+      "policy_text": "The encounter documents sinus rhythm by ECG or monitor and contains no approved atrial fibrillation or flutter history.",
       "evaluator": "sinus_rhythm",
       "params": {"accepted_sources": ["ecg", "monitor"]},
-      "fact_types": ["cardiac_rhythm", "condition_history"]
+      "fact_types": ["cardiac_rhythm", "condition_history"],
+      "operator": "equals_with_documentation_constraints",
+      "threshold": {"rhythm": "sinus", "accepted_sources": ["ecg", "monitor"]},
+      "unit": null,
+      "provenance_classification": "application_specific_demo_rule",
+      "provenance_note": "The FDA prescribing information supports sinus rhythm. Requiring ECG or monitor documentation from this encounter and treating any approved atrial fibrillation or flutter history as review-required are CardioFlow demo constraints.",
+      "criterion_sources": [
+        {
+          "title": "CORLANOR (ivabradine) prescribing information",
+          "organization": "U.S. National Library of Medicine DailyMed",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=92018a65-38f6-45f7-91d4-a34921b81d0d",
+          "section": "1.1 Heart Failure in Adult Patients; 5.2 Atrial Fibrillation",
+          "version_or_date": "Revised August 2021; DailyMed updated November 10, 2025",
+          "source_type": "fda_prescribing_information"
+        }
+      ],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R7",
-      "title": "Resting heart rate ≥ 70 bpm",
-      "policy_text": "Resting heart rate of 70 beats per minute or higher.",
+      "title": "Resting heart rate at or above 70 bpm",
+      "policy_text": "The approved resting heart rate is 70 beats per minute or higher.",
       "evaluator": "heart_rate_at_least",
       "params": {"min_bpm": 70},
-      "fact_types": ["resting_heart_rate"]
+      "fact_types": ["resting_heart_rate"],
+      "operator": "greater_than_or_equal",
+      "threshold": 70,
+      "unit": "bpm",
+      "provenance_classification": "supported_by_authoritative_source",
+      "provenance_note": "The FDA prescribing information specifies a resting heart rate of at least 70 beats per minute for the adult indication.",
+      "criterion_sources": [
+        {
+          "title": "CORLANOR (ivabradine) prescribing information",
+          "organization": "U.S. National Library of Medicine DailyMed",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=92018a65-38f6-45f7-91d4-a34921b81d0d",
+          "section": "1.1 Heart Failure in Adult Patients",
+          "version_or_date": "Revised August 2021; DailyMed updated November 10, 2025",
+          "source_type": "fda_prescribing_information"
+        }
+      ],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R8",
-      "title": "Beta-blocker optimized",
-      "policy_text": "On maximally tolerated beta-blocker dose, or beta-blocker contraindicated or not tolerated.",
+      "title": "Beta-blocker dose status",
+      "policy_text": "The approved record documents a maximally tolerated beta-blocker dose, a contraindication, or intolerance.",
       "evaluator": "beta_blocker_optimized",
-      "params": {},
-      "fact_types": ["beta_blocker_dose_status", "medication"]
+      "params": {"accepted": ["at_max_tolerated_dose", "contraindicated", "not_tolerated"]},
+      "fact_types": ["beta_blocker_dose_status", "medication"],
+      "operator": "one_of",
+      "threshold": ["at_max_tolerated_dose", "contraindicated", "not_tolerated"],
+      "unit": null,
+      "provenance_classification": "supported_by_authoritative_source",
+      "provenance_note": "The FDA prescribing information specifies maximally tolerated beta-blocker doses or a contraindication to beta-blocker use. The demo also accepts documented intolerance as review-ready evidence.",
+      "criterion_sources": [
+        {
+          "title": "CORLANOR (ivabradine) prescribing information",
+          "organization": "U.S. National Library of Medicine DailyMed",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=92018a65-38f6-45f7-91d4-a34921b81d0d",
+          "section": "1.1 Heart Failure in Adult Patients",
+          "version_or_date": "Revised August 2021; DailyMed updated November 10, 2025",
+          "source_type": "fda_prescribing_information"
+        }
+      ],
+      "last_verified_at": "2026-09-16"
     },
     {
       "id": "R9",
-      "title": "No hypotension",
-      "policy_text": "Blood pressure at or above 90/50 mmHg.",
+      "title": "Blood pressure at or above 90/50 mmHg",
+      "policy_text": "The approved blood pressure is at or above 90/50 mmHg.",
       "evaluator": "blood_pressure_at_least",
       "params": {"min_systolic": 90, "min_diastolic": 50},
-      "fact_types": ["blood_pressure"]
+      "fact_types": ["blood_pressure"],
+      "operator": "greater_than_or_equal",
+      "threshold": {"min_systolic": 90, "min_diastolic": 50},
+      "unit": "mmHg",
+      "provenance_classification": "unsupported_or_unclear",
+      "provenance_note": "The current FDA prescribing information lists clinically significant hypotension as a contraindication but does not state this numeric cutoff. The demo retains 90/50 only to preserve the existing deterministic scenario and does not present it as current clinical or coverage policy.",
+      "criterion_sources": [
+        {
+          "title": "CORLANOR (ivabradine) prescribing information",
+          "organization": "U.S. National Library of Medicine DailyMed",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=92018a65-38f6-45f7-91d4-a34921b81d0d",
+          "section": "4 Contraindications",
+          "version_or_date": "Revised August 2021; DailyMed updated November 10, 2025",
+          "source_type": "fda_prescribing_information"
+        }
+      ],
+      "last_verified_at": "2026-09-16"
     }
   ]
 }

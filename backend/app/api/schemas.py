@@ -189,9 +189,8 @@ class EncounterView(Strict):
     facts: list[Fact]  # ordered by fact-type catalog order, then first evidence segment seq
     fact_counts: FactCounts
     note_sections: list[NoteSectionView]  # fixed order: subjective, objective, medications, assessment_plan
-    # Build-order allowance (IMPLEMENTATION_PLAN): None until Phase 4 / Phase 6 land.
-    # Phase 4 and Phase 6 acceptance criteria require tightening these to non-optional.
     prior_auth: PriorAuthEvaluation  # computed live from approved facts
+    authorization_policy: AuthorizationPolicy | None
     export: ExportStatusView
 
 

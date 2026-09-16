@@ -355,6 +355,25 @@ export interface components {
             /** Expected Revision */
             expected_revision: number;
         };
+        /** CriterionSource */
+        CriterionSource: {
+            /** Title */
+            title: string;
+            /** Organization */
+            organization: string;
+            /** Url */
+            url: string;
+            /** Section */
+            section: string;
+            /** Version Or Date */
+            version_or_date: string;
+            source_type: components["schemas"]["CriterionSourceType"];
+        };
+        /**
+         * CriterionSourceType
+         * @enum {string}
+         */
+        CriterionSourceType: "fda_prescribing_information" | "professional_guideline" | "payer_policy" | "application_specification";
         /**
          * Drug
          * @enum {string}
@@ -435,6 +454,7 @@ export interface components {
             /** Note Sections */
             note_sections: components["schemas"]["NoteSectionView"][];
             prior_auth: components["schemas"]["PriorAuthEvaluation"];
+            authorization_policy: components["schemas"]["AuthorizationPolicy"] | null;
             export: components["schemas"]["ExportStatusView"];
         };
         /**
@@ -825,6 +845,22 @@ export interface components {
             };
             /** Fact Types */
             fact_types: components["schemas"]["FactType"][];
+            /** Operator */
+            operator: string;
+            /** Threshold */
+            threshold?: unknown | null;
+            /** Unit */
+            unit?: string | null;
+            provenance_classification: components["schemas"]["ProvenanceClassification"];
+            /** Provenance Note */
+            provenance_note: string;
+            /** Criterion Sources */
+            criterion_sources?: components["schemas"]["CriterionSource"][];
+            /**
+             * Last Verified At
+             * Format: date
+             */
+            last_verified_at: string;
         };
         /** PolicyView */
         PolicyView: {
@@ -842,6 +878,11 @@ export interface components {
             /** Requirements */
             requirements: components["schemas"]["RequirementEvaluation"][];
         };
+        /**
+         * ProvenanceClassification
+         * @enum {string}
+         */
+        ProvenanceClassification: "supported_by_authoritative_source" | "payer_specific" | "application_specific_demo_rule" | "unsupported_or_unclear";
         /** RequirementEvaluation */
         RequirementEvaluation: {
             /** Requirement Id */

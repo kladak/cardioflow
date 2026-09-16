@@ -59,19 +59,14 @@ const GROUPS = [
   { title: "Medications", types: ["medication"] },
   { title: "Symptoms", types: ["symptom"] },
 ];
-const REQS: Record<string, string> = {
-  R1: "Requested medication documented",
-  R2: "Prescribed by cardiology",
-  R3: "Chronic HFrEF diagnosis",
-  R4: "LVEF ≤ 35% within 12 months",
-  R5: "NYHA class II–III",
-  R6: "Sinus rhythm documented",
-  R7: "Resting heart rate ≥ 70 bpm",
-  R8: "Beta-blocker optimized",
-  R9: "No hypotension",
+const PROVENANCE_LABELS: Record<string, string> = {
+  supported_by_authoritative_source: "Authoritative source",
+  payer_specific: "Payer-specific source",
+  application_specific_demo_rule: "CardioFlow demo rule",
+  unsupported_or_unclear: "Unsupported or unclear",
 };
 const FLAGS: Record<string, string> = {
-  model_low_confidence: "The model marked this low confidence.",
+  model_low_confidence: "The extraction response marked this finding as low confidence.",
   value_not_in_evidence: "A numeric value does not appear in the quoted text.",
   hedged_language: "The evidence contains hedged language.",
   patient_reported_measurement:
@@ -87,9 +82,9 @@ function summary(f: Fact) {
   const v = valueOf(f);
   switch (f.fact_type) {
     case "lvef":
-      return `${v.percent}${v.percent_upper ? `–${v.percent_upper}` : ""}% · ${String(v.modality).replaceAll("_", " ")} · ${v.measured_on_text || "date not stated"}`;
+      return `${v.percent}${v.percent_upper ? ` to ${v.percent_upper}` : ""}% · ${String(v.modality).replaceAll("_", " ")} · ${v.measured_on_text || "date not stated"}`;
     case "nyha_class":
-      return `Class ${v.nyha}${v.nyha_upper ? `–${v.nyha_upper}` : ""}`;
+      return `Class ${v.nyha}${v.nyha_upper ? ` to ${v.nyha_upper}` : ""}`;
     case "resting_heart_rate":
       return `${v.bpm} bpm`;
     case "blood_pressure":
@@ -103,9 +98,9 @@ function summary(f: Fact) {
     case "beta_blocker_dose_status":
       return String(v.status).replaceAll("_", " ");
     case "condition_history":
-      return `${String(v.condition).replaceAll("_", " ")} — ${(f.approved || f.candidate)?.assertion}`;
+      return `${String(v.condition).replaceAll("_", " ")}: ${(f.approved || f.candidate)?.assertion}`;
     case "symptom":
-      return `${String(v.symptom).replaceAll("_", " ")} — ${(f.approved || f.candidate)?.assertion}`;
+      return `${String(v.symptom).replaceAll("_", " ")}: ${(f.approved || f.candidate)?.assertion}`;
     default:
       return JSON.stringify(v);
   }
@@ -116,7 +111,7 @@ function glyph(f: Fact) {
       ? "✎✓"
       : "✓"
     : f.review.status === "rejected"
-      ? "—"
+      ? "×"
       : f.candidate?.flags.length
         ? "◐"
         : "○";
@@ -135,6 +130,12 @@ function scrollToEvidence(fact: Fact) {
   document
     .getElementById(`seg-${segmentId}`)
     ?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function sourceOf(fact: Fact) {
+  const evidence = (fact.approved || fact.candidate)?.evidence?.[0];
+  if (!evidence) return "Clinician-entered finding";
+  return `Transcript turn ${evidence.segment_id.replace("s", "")} (${evidence.speaker.toLowerCase()})`;
 }
 
 export default function Workspace({ id }: { id: string }) {
@@ -251,8 +252,7 @@ export default function Workspace({ id }: { id: string }) {
     }
     await mutate(`/api/encounters/${id}/facts/${selectedFact.id}/review`, body);
   }
-  const supportsAuthorization =
-    view?.encounter.context.fixture_id?.startsWith("hfref") ?? true;
+  const supportsAuthorization = Boolean(view?.authorization_policy);
   useEffect(() => {
     if (view && !supportsAuthorization && tab === "authorization") {
       navigate("findings");
@@ -306,6 +306,7 @@ export default function Workspace({ id }: { id: string }) {
   const satisfied = view.prior_auth.requirements.filter(
     (r) => r.status === "SATISFIED",
   ).length;
+  const requirementCount = view.authorization_policy?.requirements.length || 0;
   const reviewed = view.fact_counts.approved + view.fact_counts.rejected;
   const reviewComplete =
     view.fact_counts.total > 0 && reviewed === view.fact_counts.total;
@@ -364,14 +365,14 @@ export default function Workspace({ id }: { id: string }) {
           <span className="status">
             {view.fact_counts.total
               ? `${reviewed} of ${view.fact_counts.total} reviewed · ${view.fact_counts.pending_flagged} flagged`
-              : "—"}
+              : "No findings"}
           </span>
         </div>
         {supportsAuthorization && (
           <div className={`stage ${currentStage === "authorization" ? "current" : ""}`}>
             <span>4. Authorization</span>
             <span className="status">
-              Approved evidence · {view.prior_auth.overall.replaceAll("_", " ")} · {satisfied}/9
+              Approved findings · {view.prior_auth.overall.replaceAll("_", " ")} · {satisfied}/{requirementCount}
             </span>
           </div>
         )}
@@ -537,12 +538,12 @@ function CurrentAction({
             : "All findings have a clinician decision. Inspect the verified note or create a structured export.",
         ],
     note: [
-      "Inspect the approved-state note",
-      "This note is regenerated only from findings a clinician approved; proposed and rejected facts stay out.",
+      "Inspect the verified note",
+      "The note uses approved findings. Proposed and rejected findings are excluded.",
     ],
     authorization: [
-      "Trace evidence to the authorization result",
-      "Each criterion shows which approved facts were used. Change the approved heart rate to see the result update deterministically.",
+      "Inspect the documentation-readiness checks",
+      "Each row separates the patient transcript source from the source for the criterion. Edit the approved heart rate to update the result.",
     ],
     export: [
       "Export the verified record",
@@ -583,22 +584,22 @@ function Extract({
   const failed = view.extraction.latest_run?.status === "failed";
   return (
     <div className="extract">
-      <div className="eyebrow">AI-style extraction · deterministic fixture</div>
-      <h1>Turn the transcript into reviewable clinical findings.</h1>
+      <div className="eyebrow">Deterministic fixture extraction</div>
+      <h1>Create candidate findings from the transcript.</h1>
       <p>
-        CardioFlow proposes structured facts and anchors every proposal to
-        transcript evidence. Nothing becomes authoritative until a clinician
-        approves it.
+        CardioFlow creates structured candidate findings and links each one to
+        exact transcript text. A clinician must review each finding.
       </p>
       <div className="boundary">
-        <strong>Safety boundary</strong>
+        <strong>Not yet approved</strong>
         <br />
-        Proposed state cannot drive downstream workflow logic or FHIR export.
+        Proposed findings are excluded from the note, authorization check, and
+        FHIR export.
       </div>
       {failed && (
         <div className="error extraction-failure" role="alert">
           <strong>Extraction failed safely</strong>
-          <p>The model response could not be used. No findings were created.</p>
+          <p>The extraction response did not match the contract. No findings were created.</p>
           {(view.extraction.latest_run?.issues || []).map((issue, index) => (
             <p className="mono" key={`${issue.kind}-${index}`}>
               {issue.kind.replaceAll("_", " ")}: {issue.message}
@@ -611,7 +612,7 @@ function Extract({
           {error}
         </div>
       )}
-      <p className="mono">Provider: Mock · no external API</p>
+      <p className="mono">Provider: deterministic mock. No external API.</p>
       <button className="btn primary" onClick={onRun} disabled={busy}>
         {busy ? "Extracting…" : failed ? "Retry extraction" : "Run extraction"}
       </button>
@@ -818,10 +819,10 @@ function Findings({
                       <strong>{reviewLabel(f)}</strong>
                       <span>
                         {f.review.status === "approved"
-                          ? "Approved state can inform downstream workflow and export."
+                          ? "This approved finding is included in the note, configured checks, and supported export mappings."
                           : f.review.status === "rejected"
-                            ? "Rejected state remains excluded from downstream workflows and export."
-                            : "Proposed state cannot inform downstream workflows or export."}
+                            ? "This rejected finding is excluded from the note, configured checks, and export."
+                            : "Not yet approved. This finding is excluded from the note, authorization check, and export."}
                       </span>
                     </div>
                     {f.candidate?.flags.length ? (
@@ -1136,33 +1137,34 @@ function Authorization({
   view: View;
   onFact: (id: string) => void;
 }) {
+  const policy = view.authorization_policy;
+  if (!policy) return null;
   const outcome = view.prior_auth.overall;
+  const requirements = new Map(policy.requirements.map((requirement) => [requirement.id, requirement]));
   return (
     <div className="auth">
       <div className="simulated">
-        <strong>Simulated policy.</strong> Demonstration criteria written for
-        CardioFlow. Not a real insurer&apos;s policy or a coverage
-        determination.
+        <strong>Simulated documentation-readiness check.</strong> {policy.disclaimer}
       </div>
       <div className={`decision-flow ${outcome.toLowerCase()}`}>
         <div>
-          <span>Approved evidence</span>
+          <span>Approved findings</span>
           <strong>{view.fact_counts.approved} findings</strong>
         </div>
         <b aria-hidden="true">→</b>
         <div>
-          <span>Simulated criteria</span>
-          <strong>9 deterministic checks</strong>
+          <span>Configured checks</span>
+          <strong>{policy.requirements.length} deterministic criteria</strong>
         </div>
         <b aria-hidden="true">→</b>
         <div className="decision-outcome">
-          <span>Current outcome</span>
+          <span>Documentation result</span>
           <strong>{outcome.replaceAll("_", " ")}</strong>
         </div>
       </div>
       <div className="headline">
         <div>
-          <div className="eyebrow">Ivabradine · simulated criteria v1.0.0</div>
+          <div className="eyebrow">{policy.display_name} · version {policy.version}</div>
           <h2
             className={
               view.prior_auth.overall === "READY"
@@ -1173,10 +1175,10 @@ function Authorization({
             }
           >
             {view.prior_auth.overall === "READY"
-              ? "Ready — all 9 criteria documented"
+              ? `Ready. All ${policy.requirements.length} configured checks passed.`
               : view.prior_auth.overall === "NOT_MET"
-                ? "Not met by approved findings"
-                : "Documentation is incomplete"}
+                ? "At least one configured check is not met."
+                : "Approved documentation is incomplete."}
           </h2>
         </div>
         <span className="mono muted">
@@ -1184,47 +1186,134 @@ function Authorization({
         </span>
       </div>
       <div className="requirements">
-        {view.prior_auth.requirements.map((r) => (
-          <div
-            className={`requirement ${r.requirement_id === "R7" ? "heart-rate-rule" : ""}`}
-            data-testid={`requirement-${r.requirement_id}`}
-            key={r.requirement_id}
-          >
-            <span className={`statusword ${r.status}`}>
-              {r.status === "SATISFIED"
-                ? "✓ Satisfied"
-                : r.status === "MISSING"
-                  ? "○ Missing"
-                  : r.status === "NOT_MET"
-                    ? "✕ Not met"
-                    : "! Needs review"}
-            </span>
-            <strong>{REQS[r.requirement_id]}</strong>
-            <div>
-              <p>{r.explanation}</p>
-              {r.used_fact_ids.map((id) => (
-                <button
-                  className="chip approved-chip"
-                  key={id}
-                  onClick={() => onFact(id)}
-                  title="Open the approved finding and its transcript evidence"
-                >
-                  {summary(view.facts.find((f) => f.id === id)!)}
-                </button>
-              ))}
-              {r.pending_fact_ids.map((id) => (
-                <button
-                  className="chip pending-chip"
-                  key={id}
-                  onClick={() => onFact(id)}
-                  title="Review the proposed finding before it can be used"
-                >
-                  Review candidate →
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+        {view.prior_auth.requirements.map((result) => {
+          const criterion = requirements.get(result.requirement_id);
+          if (!criterion) return null;
+          const facts = result.used_fact_ids
+            .map((id) => view.facts.find((fact) => fact.id === id))
+            .filter((fact): fact is Fact => Boolean(fact));
+          const sources = criterion.criterion_sources || [];
+          const firstSource = sources[0];
+          return (
+            <article
+              className={`requirement ${result.requirement_id === "R7" ? "heart-rate-rule" : ""}`}
+              data-testid={`requirement-${result.requirement_id}`}
+              key={result.requirement_id}
+            >
+              <header className="requirement-heading">
+                <div>
+                  <span className="criterion-id">{result.requirement_id}</span>
+                  <h3>{criterion.title}</h3>
+                </div>
+                <div className="criterion-badges">
+                  <span
+                    className={`source-classification ${criterion.provenance_classification}`}
+                  >
+                    {PROVENANCE_LABELS[criterion.provenance_classification]}
+                  </span>
+                  <span className={`statusword ${result.status}`}>
+                    {result.status === "SATISFIED"
+                      ? "✓ Met"
+                      : result.status === "MISSING"
+                        ? "○ Missing"
+                        : result.status === "NOT_MET"
+                          ? "✕ Not met"
+                          : "! Needs review"}
+                  </span>
+                </div>
+              </header>
+              <div className="criterion-grid">
+                <section>
+                  <span className="criterion-label">Criterion</span>
+                  <strong>{criterion.policy_text}</strong>
+                </section>
+                <section>
+                  <span className="criterion-label">Patient value</span>
+                  {facts.length ? (
+                    facts.map((fact) => (
+                      <button
+                        className="patient-fact"
+                        key={fact.id}
+                        onClick={() => onFact(fact.id)}
+                        title="Open the approved finding and transcript evidence"
+                      >
+                        <strong>{summary(fact)}</strong>
+                        <small>Patient source: {sourceOf(fact)}</small>
+                      </button>
+                    ))
+                  ) : (result.context_fields_used || []).length ? (
+                    <div className="context-value">
+                      <strong>{view.encounter.context.specialty}</strong>
+                      <small>Patient source: encounter context</small>
+                    </div>
+                  ) : (
+                    <span className="missing-value">No approved value</span>
+                  )}
+                  {result.pending_fact_ids.map((id) => (
+                    <button
+                      className="chip pending-chip"
+                      key={id}
+                      onClick={() => onFact(id)}
+                      title="Review the proposed finding before it can be used"
+                    >
+                      Review proposed finding
+                    </button>
+                  ))}
+                </section>
+                <section>
+                  <span className="criterion-label">Criterion source</span>
+                  {firstSource ? (
+                    <>
+                      <a href={firstSource.url} target="_blank" rel="noreferrer">
+                        {firstSource.title}
+                      </a>
+                      <small>{firstSource.section}</small>
+                    </>
+                  ) : (
+                    <span className="missing-value">CardioFlow application rule. No external source.</span>
+                  )}
+                </section>
+                <section className="criterion-result">
+                  <span className="criterion-label">Result</span>
+                  <strong className={result.status}>{result.status.replaceAll("_", " ")}</strong>
+                  <p>{result.explanation}</p>
+                </section>
+              </div>
+              <details className="criterion-details">
+                <summary>Criterion provenance and rule details</summary>
+                <p>{criterion.provenance_note}</p>
+                <dl>
+                  <div>
+                    <dt>Classification</dt>
+                    <dd>{PROVENANCE_LABELS[criterion.provenance_classification]}</dd>
+                  </div>
+                  <div>
+                    <dt>Operator</dt>
+                    <dd className="mono">{criterion.operator}</dd>
+                  </div>
+                  <div>
+                    <dt>Threshold</dt>
+                    <dd className="mono">{JSON.stringify(criterion.threshold)}</dd>
+                  </div>
+                  <div>
+                    <dt>Last verified</dt>
+                    <dd className="mono">{criterion.last_verified_at}</dd>
+                  </div>
+                </dl>
+                {sources.map((source) => (
+                  <div className="criterion-citation" key={`${criterion.id}-${source.url}`}>
+                    <a href={source.url} target="_blank" rel="noreferrer">
+                      {source.title}
+                    </a>
+                    <span>{source.organization}</span>
+                    <span>{source.section}</span>
+                    <span>{source.version_or_date}</span>
+                  </div>
+                ))}
+              </details>
+            </article>
+          );
+        })}
       </div>
     </div>
   );
@@ -1241,7 +1330,7 @@ function Note({
     <div className="notegrid">
       <div className="headline">
         <div>
-          <div className="eyebrow">Derived only from approved findings</div>
+          <div className="eyebrow">Uses approved findings</div>
           <h2>Clinical note</h2>
         </div>
       </div>
@@ -1312,7 +1401,7 @@ function ExportPane({
   }
   return (
     <div className="export">
-      <div className="eyebrow">Approved-state boundary</div>
+      <div className="eyebrow">Export content</div>
       <h2>FHIR R4 export</h2>
       <p className="muted">
         Verified findings can be exported in a standard format used for
@@ -1337,7 +1426,7 @@ function ExportPane({
         <li>
           {view.fact_counts.pending === 0 ? "✓" : "○"} All findings reviewed{" "}
           {view.fact_counts.pending
-            ? `— ${view.fact_counts.pending} pending`
+            ? `; ${view.fact_counts.pending} pending`
             : ""}
         </li>
         <li>
@@ -1380,7 +1469,7 @@ function ExportPane({
               <ul>
                 {active.excluded.map((item) => (
                   <li key={item.fact_id}>
-                    <span className="mono">{item.fact_id}</span> — {item.reason}
+                    <span className="mono">{item.fact_id}</span>: {item.reason}
                   </li>
                 ))}
               </ul>

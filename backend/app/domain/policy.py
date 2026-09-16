@@ -6,10 +6,11 @@ registered, deterministic Python evaluator plus parameters. There is no rule DSL
 
 from __future__ import annotations
 
+from datetime import date
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from app.domain.facts import Drug, FactType, Strict
 
@@ -40,6 +41,29 @@ class EvaluatorName(StrEnum):
     BLOOD_PRESSURE_AT_LEAST = "blood_pressure_at_least"
 
 
+class ProvenanceClassification(StrEnum):
+    SUPPORTED = "supported_by_authoritative_source"
+    PAYER_SPECIFIC = "payer_specific"
+    DEMO_RULE = "application_specific_demo_rule"
+    UNSUPPORTED = "unsupported_or_unclear"
+
+
+class CriterionSourceType(StrEnum):
+    FDA_LABEL = "fda_prescribing_information"
+    PROFESSIONAL_GUIDELINE = "professional_guideline"
+    PAYER_POLICY = "payer_policy"
+    APPLICATION_SPECIFICATION = "application_specification"
+
+
+class CriterionSource(Strict):
+    title: str
+    organization: str
+    url: str
+    section: str
+    version_or_date: str
+    source_type: CriterionSourceType
+
+
 class PolicyRequirement(Strict):
     id: str = Field(pattern=r"^R\d+$")
     title: str
@@ -47,6 +71,27 @@ class PolicyRequirement(Strict):
     evaluator: EvaluatorName
     params: dict[str, Any] = Field(default_factory=dict)
     fact_types: list[FactType]  # which fact types can answer it (drives "Add from chart" + pending links)
+    operator: str
+    threshold: Any | None = None
+    unit: str | None = None
+    provenance_classification: ProvenanceClassification
+    provenance_note: str
+    criterion_sources: list[CriterionSource] = Field(default_factory=list)
+    last_verified_at: date
+
+    @model_validator(mode="after")
+    def authoritative_classifications_require_matching_sources(self) -> PolicyRequirement:
+        source_types = {source.source_type for source in self.criterion_sources}
+        if self.provenance_classification is ProvenanceClassification.SUPPORTED and not source_types.intersection(
+            {CriterionSourceType.FDA_LABEL, CriterionSourceType.PROFESSIONAL_GUIDELINE}
+        ):
+            raise ValueError("authoritatively supported criteria require an FDA label or professional guideline source")
+        if (
+            self.provenance_classification is ProvenanceClassification.PAYER_SPECIFIC
+            and CriterionSourceType.PAYER_POLICY not in source_types
+        ):
+            raise ValueError("payer-specific criteria require a payer policy source")
+        return self
 
 
 class AuthorizationPolicy(Strict):
