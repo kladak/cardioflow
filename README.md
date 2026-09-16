@@ -1,5 +1,7 @@
 # CardioFlow
 
+[![CI](https://github.com/kladak/cardioflow/actions/workflows/ci.yml/badge.svg)](https://github.com/kladak/cardioflow/actions/workflows/ci.yml)
+
 CardioFlow is a local prototype that explores documentation and authorization workflow gaps in cardiology operations. It converts a synthetic encounter transcript into candidate clinical findings, links every finding to exact transcript evidence, and requires clinician review before a finding can affect a note, a documentation-readiness check, or a structured export.
 
 Synthetic data only. Not for clinical use. The authorization workflow is a simulation and does not determine coverage.
