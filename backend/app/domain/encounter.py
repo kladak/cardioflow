@@ -1,5 +1,5 @@
 """Encounter aggregate: the single unit of persistence (stored as one JSON document).
-Derived views (workflow stage, note text, prior-auth evaluation, export staleness)
+Derived views (workflow stage, note text, documentation-readiness evaluation, export staleness)
 are computed on read and are NOT stored here — see app/api/schemas.py.
 """
 

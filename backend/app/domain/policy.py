@@ -1,4 +1,4 @@
-"""Simulated prior-authorization policy + evaluation result types.
+"""Simulated documentation-readiness policy and evaluation result types.
 
 A policy is DATA (JSON under app/policy/policies/). Each requirement names one
 registered, deterministic Python evaluator plus parameters. There is no rule DSL.

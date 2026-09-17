@@ -46,7 +46,7 @@ In an isolated checkout with no virtual environment, `node_modules`, SQLite data
 ```bash
 make setup
 make check
-make web-build
+CARDIOFLOW_API_ORIGIN=http://127.0.0.1:8123 make web-build
 PORT=3123 API_PORT=8123 CARDIOFLOW_API_ORIGIN=http://127.0.0.1:8123 make start
 ```
 

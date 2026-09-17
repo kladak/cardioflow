@@ -825,7 +825,7 @@ function Findings({
                           ? "This approved finding is included in the note, configured checks, and supported export mappings."
                           : f.review.status === "rejected"
                             ? "This rejected finding is excluded from the note, configured checks, and export."
-                            : "Not yet approved. This finding is excluded from the note, authorization check, and export."}
+                            : "Not yet approved. This finding is excluded from the note, documentation check, and export."}
                       </span>
                     </div>
                     {f.candidate?.flags.length ? (
@@ -1412,7 +1412,7 @@ function ExportPane({
       <h2>FHIR R4 export</h2>
       <p className="muted">
         Verified findings can be exported in a standard format used for
-        exchanging healthcare data. Authorization readiness is not required,
+        exchanging healthcare data. Documentation readiness is not required,
         and the clinical note is not included in this bundle.
       </p>
       <div className="export-boundary">

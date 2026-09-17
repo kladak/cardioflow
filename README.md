@@ -60,8 +60,11 @@ make dev
 To use different local ports:
 
 ```bash
+CARDIOFLOW_API_ORIGIN=http://127.0.0.1:8123 make web-build
 API_PORT=8123 CARDIOFLOW_API_ORIGIN=http://127.0.0.1:8123 PORT=3123 make start
 ```
+
+The proxy destination is recorded by the Next.js production build, so use the same `CARDIOFLOW_API_ORIGIN` for `make web-build` and `make start`.
 
 ## Technology
 
