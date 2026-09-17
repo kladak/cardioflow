@@ -298,7 +298,7 @@ export interface components {
         };
         /**
          * CandidateFact
-         * @description Immutable AI proposal. Written once at ingest; never mutated by review.
+         * @description Immutable extraction proposal. Written once at ingest; never mutated by review.
          */
         CandidateFact: {
             /** Value */
@@ -337,18 +337,11 @@ export interface components {
         };
         /**
          * CreateEncounterRequest
-         * @description Exactly one of fixture_id or (patient + context + transcript_text).
+         * @description Create one of the packaged synthetic demonstration encounters.
          */
         CreateEncounterRequest: {
             /** Fixture Id */
-            fixture_id?: string | null;
-            patient?: components["schemas"]["SyntheticPatient"] | null;
-            context?: components["schemas"]["EncounterContext"] | null;
-            /**
-             * Transcript Text
-             * @description Lines of 'CLINICIAN: …' | 'PATIENT: …' | 'STAFF: …' | 'OTHER: …'. Blank lines ignored.
-             */
-            transcript_text?: string | null;
+            fixture_id: string;
         };
         /** CreateExportRequest */
         CreateExportRequest: {
@@ -433,7 +426,7 @@ export interface components {
             visit_type: string;
             stage: components["schemas"]["WorkflowStage"];
             /** Readiness */
-            readiness: string;
+            readiness: string | null;
             /** Authorization Applicable */
             authorization_applicable: boolean;
             /**
@@ -453,7 +446,7 @@ export interface components {
             fact_counts: components["schemas"]["FactCounts"];
             /** Note Sections */
             note_sections: components["schemas"]["NoteSectionView"][];
-            prior_auth: components["schemas"]["PriorAuthEvaluation"];
+            prior_auth: components["schemas"]["PriorAuthEvaluation"] | null;
             authorization_policy: components["schemas"]["AuthorizationPolicy"] | null;
             export: components["schemas"]["ExportStatusView"];
         };
@@ -583,9 +576,9 @@ export interface components {
             id: string;
             /**
              * Provider
-             * @enum {string}
+             * @constant
              */
-            provider: "mock" | "anthropic";
+            provider: "mock";
             /** Model */
             model?: string | null;
             /** Prompt Version */
@@ -624,9 +617,9 @@ export interface components {
             can_run: boolean;
             /**
              * Provider
-             * @enum {string}
+             * @constant
              */
-            provider: "mock" | "anthropic";
+            provider: "mock";
         };
         /** Fact */
         Fact: {
@@ -966,7 +959,7 @@ export interface components {
         };
         /**
          * SyntheticPatient
-         * @description Demographics come from the fixture / create request. NEVER extracted by AI.
+         * @description Demographics come from the fixture and are never inferred by extraction.
          */
         SyntheticPatient: {
             /** Synthetic Mrn */

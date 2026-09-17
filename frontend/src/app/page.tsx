@@ -12,7 +12,7 @@ const WORKFLOW = [
   ["1", "Clinical conversation", "Read the synthetic encounter transcript."],
   ["2", "Extract findings", "Create candidate facts linked to exact transcript text."],
   ["3", "Clinician review", "Approve, edit, or reject each candidate finding."],
-  ["4", "Evaluate criteria", "Run configured rules against approved findings."],
+  ["4", "Evaluate documentation", "Run configured checks against approved findings."],
   ["5", "Export record", "Create FHIR data from approved findings."],
 ];
 
@@ -101,7 +101,7 @@ export default function Home() {
             <p className="lede">
               CardioFlow creates candidate clinical findings from a transcript and links each
               finding to its supporting text. A clinician approves, edits, or rejects each
-              finding. Notes, authorization checks, and exports use approved findings.
+              finding. Notes, configured documentation checks, and exports use approved findings.
             </p>
           </div>
           <div className="service-note">
@@ -125,7 +125,7 @@ export default function Home() {
         <div className="trust-boundary">
           <strong>Proposed means not yet reviewed.</strong>
           <span>
-            A proposed finding is excluded from the note, authorization check, and export until a
+            A proposed finding is excluded from the note, documentation checks, and export until a
             clinician approves it.
           </span>
         </div>
@@ -158,14 +158,14 @@ export default function Home() {
                 <span className="state-label ready">Complete workflow</span>
               </div>
               <div>
-                <h3>HFrEF authorization review</h3>
+                <h3>HFrEF documentation-readiness review</h3>
                 <p>
                   Review a synthetic heart-failure encounter, verify findings, inspect nine
                   documentation-readiness checks, and export approved findings as FHIR.
                 </p>
                 <ul className="demo-details">
                   <li>18 evidence-linked findings</li>
-                  <li>Heart rate 64: Not met. Heart rate 78: Ready.</li>
+                  <li>Heart rate 64: check not met. Heart rate 78: checks ready.</li>
                   <li>Export contains approved findings</li>
                 </ul>
               </div>
@@ -321,7 +321,7 @@ export default function Home() {
                       <td>{encounter.visit_type}</td>
                       <td>{encounter.stage.replaceAll("_", " ")}</td>
                       <td>
-                        {encounter.authorization_applicable ? (
+                        {encounter.authorization_applicable && encounter.readiness ? (
                           <span className={`state-label ${encounter.readiness.toLowerCase()}`}>
                             {encounter.readiness.replaceAll("_", " ")}
                           </span>

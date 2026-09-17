@@ -111,7 +111,7 @@ def test_every_policy_requirement_has_explicit_provenance() -> None:
         "R6": ProvenanceClassification.DEMO_RULE,
         "R7": ProvenanceClassification.SUPPORTED,
         "R8": ProvenanceClassification.SUPPORTED,
-        "R9": ProvenanceClassification.UNSUPPORTED,
+        "R9": ProvenanceClassification.DEMO_RULE,
     }
     assert not any(value is ProvenanceClassification.PAYER_SPECIFIC for value in classifications.values())
     for requirement in policy.requirements:

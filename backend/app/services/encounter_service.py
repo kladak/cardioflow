@@ -67,10 +67,6 @@ class EncounterService:
         )
 
     def create(self, req: CreateEncounterRequest):
-        if not req.fixture_id:
-            raise ServiceError(
-                "validation_error", "This demo currently creates encounters from the supplied synthetic fixtures.", 422
-            )
         try:
             raw = fixture_data(req.fixture_id)
         except KeyError:
@@ -245,6 +241,8 @@ class EncounterService:
                 )
 
     def _readiness_event(self, e: Encounter):
+        if e.context.fixture_id not in {"hfref_golden", "hfref_ambiguous"}:
+            return []
         prior = evaluate(
             load_policy(),
             approved_facts(e),
@@ -264,7 +262,7 @@ class EncounterService:
                 self._event(
                     e,
                     AuditEventType.READINESS_CHANGED,
-                    f"Authorization readiness is now {prior.overall.value.replace('_', ' ').title()}.",
+                    f"Documentation readiness is now {prior.overall.value.replace('_', ' ').title()}.",
                     payload={"overall": prior.overall, "changes": changes},
                     actor="system",
                     seq_offset=1,

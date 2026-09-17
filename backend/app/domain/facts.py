@@ -6,7 +6,7 @@ all depend on these types. Change them deliberately and update ARCHITECTURE.md Â
 
 Key invariant: *nothing downstream of review (rules, note, FHIR) may read
 `Fact.candidate`*. Downstream code reads `Fact.approved` only. See
-`approved_facts()` in services (to be implemented) â€” it is the single gate.
+`approved_facts()` in services is the single gate.
 """
 
 from __future__ import annotations
@@ -351,7 +351,7 @@ class ReviewStatus(StrEnum):
 
 
 class CandidateFact(Strict):
-    """Immutable AI proposal. Written once at ingest; never mutated by review."""
+    """Immutable extraction proposal. Written once at ingest; never mutated by review."""
 
     value: FactValue
     assertion: Assertion

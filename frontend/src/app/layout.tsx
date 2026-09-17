@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
   title: "CardioFlow",
-  description: "Synthetic cardiology documentation workflow",
+  description: "Synthetic clinical evidence review and structured export prototype",
 };
 export default function RootLayout({
   children,

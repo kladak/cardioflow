@@ -28,6 +28,16 @@ class SQLiteStore:
               id TEXT PRIMARY KEY, encounter_id TEXT NOT NULL, seq INTEGER NOT NULL,
               at TEXT NOT NULL, type TEXT NOT NULL, doc TEXT NOT NULL,
               UNIQUE(encounter_id, seq));
+            CREATE TRIGGER IF NOT EXISTS audit_events_no_update
+            BEFORE UPDATE ON audit_events
+            BEGIN
+              SELECT RAISE(ABORT, 'audit_events are append-only');
+            END;
+            CREATE TRIGGER IF NOT EXISTS audit_events_no_delete
+            BEFORE DELETE ON audit_events
+            BEGIN
+              SELECT RAISE(ABORT, 'audit_events are append-only');
+            END;
             """)
 
     def _connect(self) -> sqlite3.Connection:

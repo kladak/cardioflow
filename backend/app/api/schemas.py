@@ -21,7 +21,7 @@ from app.domain.encounter import (
     SyntheticPatient,
     Transcript,
 )
-from app.domain.facts import Assertion, Fact, FactType, Strict
+from app.domain.facts import Assertion, Fact, Strict
 from app.domain.policy import AuthorizationPolicy, PriorAuthEvaluation
 
 
@@ -50,16 +50,9 @@ class ErrorResponse(Strict):
 
 # --------------------------------------------------------------------------- requests
 class CreateEncounterRequest(Strict):
-    """Exactly one of fixture_id or (patient + context + transcript_text)."""
+    """Create one of the packaged synthetic demonstration encounters."""
 
-    fixture_id: str | None = None
-    patient: SyntheticPatient | None = None
-    context: EncounterContext | None = None
-    transcript_text: str | None = Field(
-        default=None,
-        max_length=100_000,
-        description="Lines of 'CLINICIAN: …' | 'PATIENT: …' | 'STAFF: …' | 'OTHER: …'. Blank lines ignored.",
-    )
+    fixture_id: str
 
 
 class RunExtractionRequest(Strict):
@@ -79,14 +72,6 @@ class ReviewFactRequest(Strict):
     value: dict[str, Any] | None = None  # required for approve_with_edit; validated with parse_value(fact_type)
     assertion: Assertion | None = None  # optional for approve_with_edit (defaults to candidate/current)
     reason: str | None = Field(default=None, max_length=280)  # required for reject
-
-
-class AddFactRequest(Strict):
-    expected_revision: int
-    fact_type: FactType
-    value: dict[str, Any]
-    assertion: Assertion = Assertion.AFFIRMED
-    attestation_note: str = Field(min_length=3, max_length=280)  # "Per echo report 2026-06-12 in EHR"
 
 
 class NoteSectionAction(StrEnum):
@@ -129,7 +114,7 @@ class ExtractionSummary(Strict):
     latest_run: ExtractionRun | None
     run_count: int
     can_run: bool  # False once any fact has been reviewed or clinician-added
-    provider: Literal["mock", "anthropic"]  # the configured provider for the next run
+    provider: Literal["mock"]  # the deterministic provider used by this prototype
 
 
 class NoteLine(Strict):
@@ -189,7 +174,7 @@ class EncounterView(Strict):
     facts: list[Fact]  # ordered by fact-type catalog order, then first evidence segment seq
     fact_counts: FactCounts
     note_sections: list[NoteSectionView]  # fixed order: subjective, objective, medications, assessment_plan
-    prior_auth: PriorAuthEvaluation  # computed live from approved facts
+    prior_auth: PriorAuthEvaluation | None  # HFrEF fixtures only; computed live from approved facts
     authorization_policy: AuthorizationPolicy | None
     export: ExportStatusView
 
@@ -200,7 +185,7 @@ class EncounterListItem(Strict):
     encounter_date: str
     visit_type: str
     stage: WorkflowStage
-    readiness: str  # OverallReadiness value
+    readiness: str | None  # OverallReadiness value for applicable HFrEF fixtures
     authorization_applicable: bool
     updated_at: datetime
 

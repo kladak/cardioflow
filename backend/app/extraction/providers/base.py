@@ -1,6 +1,6 @@
 """Provider boundary. A provider returns RAW TEXT and metadata only.
 Parsing, validation, grounding, and flagging happen in app/extraction/pipeline.py
-(to be implemented) so every provider is held to the same contract."""
+so provider output is held to the same contract."""
 
 from __future__ import annotations
 
@@ -28,16 +28,11 @@ class ProviderError(Exception):
 
 
 class ExtractionProvider(Protocol):
-    name: Literal["mock", "anthropic"]
-    supports_repair_retry: bool  # mock: False (deterministic); anthropic: True
+    name: Literal["mock"]
+    supports_repair_retry: bool  # False for the deterministic fixture provider
 
     def extract(self, request: ProviderRequest) -> ProviderResponse: ...
 
 
-# Implementations to build:
-#   mock.py      — MockProvider(scenario_map): returns fixtures/extraction/<fixture_id>.<scenario>.json
-#                  text verbatim; scenario defaults to "default"; unknown fixture ⇒ envelope with facts: [].
-#                  Env CARDIOFLOW_MOCK_SCENARIO lets tests/E2E force e.g. "invalid_json".
-#   anthropic.py — AnthropicProvider(model, api_key, timeout_s=60): Messages API with one tool
-#                  `record_extraction` whose input_schema = extraction_json_schema(), tool_choice forced,
-#                  temperature 0. raw_text = json.dumps(tool_use.input). SDK errors ⇒ ProviderError.
+# MockProvider returns fixtures/extraction/<fixture_id>.<scenario>.json verbatim.
+# CARDIOFLOW_MOCK_SCENARIO lets tests force contract failures such as invalid_json.

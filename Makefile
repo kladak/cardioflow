@@ -13,7 +13,7 @@ setup-backend:
 	$(PIP) install -q -e "backend[dev]"
 
 setup-frontend:
-	@if [ -f frontend/package.json ]; then cd frontend && npm install; else echo "frontend not created yet (Phase 0)"; fi
+	@if [ -f frontend/package.json ]; then cd frontend && npm ci; else echo "frontend package not found"; fi
 
 check-api-port:
 	@$(PY) scripts/check_port.py $(API_HOST) $(API_PORT)

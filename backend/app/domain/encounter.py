@@ -17,7 +17,7 @@ from app.domain.policy import RequirementStatus
 
 # --------------------------------------------------------------------------- identity & context
 class SyntheticPatient(Strict):
-    """Demographics come from the fixture / create request. NEVER extracted by AI."""
+    """Demographics come from the fixture and are never inferred by extraction."""
 
     synthetic_mrn: str = Field(pattern=r"^SYN-\d{6}$")
     given_name: str
@@ -90,7 +90,7 @@ class ExtractionRunStatus(StrEnum):
 
 class ExtractionRun(Strict):
     id: str = Field(pattern=r"^run_[a-z0-9]{10,}$")
-    provider: Literal["mock", "anthropic"]
+    provider: Literal["mock"]
     model: str | None = None
     prompt_version: str
     started_at: datetime

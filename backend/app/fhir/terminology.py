@@ -3,7 +3,7 @@
 POLICY: the mapper emits a `coding` entry ONLY when status == "verified".
 Unverified entries render as CodeableConcept.text only. Every code below was
 proposed from author knowledge and is UNVERIFIED until checked against the
-source listed (Phase 6 task in IMPLEMENTATION_PLAN.md). Verifying = look it up,
+source listed in this file. Verifying means looking it up,
 confirm the display, set status="verified", fill verified_on.
 """
 
@@ -29,7 +29,7 @@ class Code:
     verified_on: str | None = None
 
 
-# key → candidate code. Keys are referenced by app/fhir/mapper.py (to be implemented).
+# key → candidate code. Entries remain disabled until independently verified.
 TERMS: dict[str, Code] = {
     # Observations (verify at https://loinc.org/search/)
     "obs.lvef": Code(LOINC, "10230-1", "Left ventricular Ejection fraction", "unverified", "loinc.org"),

@@ -101,6 +101,7 @@ def test_simulated_gerd_uses_review_note_and_export_without_invented_policy(tmp_
     assert view["fact_counts"]["pending_flagged"] == 0
     assert view["encounter"]["context"]["specialty"] == "gastroenterology"
     assert view["authorization_policy"] is None
+    assert view["prior_auth"] is None
 
     for fact in list(view["facts"]):
         response = client.post(
@@ -111,6 +112,8 @@ def test_simulated_gerd_uses_review_note_and_export_without_invented_policy(tmp_
         view = response.json()
 
     assert view["fact_counts"]["approved"] == 8
+    audit = client.get(f"/api/encounters/{view['encounter']['id']}/audit").json()
+    assert not any(event["type"] == "prior_auth.readiness_changed" for event in audit)
     note = "\n".join(section["effective_text"] for section in view["note_sections"])
     assert "gastroesophageal reflux disease" in note
     assert "omeprazole 20 milligrams daily" in note
@@ -129,3 +132,27 @@ def test_simulated_gerd_uses_review_note_and_export_without_invented_policy(tmp_
     assert encounter["serviceType"]["text"] == "Gastroenterology"
     assert len(export["excluded"]) == 6
     Bundle.model_validate(export["bundle"])
+
+
+def test_reopen_removes_reviewed_value_from_downstream_state(tmp_path: Path) -> None:
+    client = TestClient(create_app(Settings(db_path=tmp_path / "reopen.db")))
+    view = create_and_extract(client, "hfref_golden")
+    heart_rate = next(fact for fact in view["facts"] if fact["fact_type"] == "resting_heart_rate")
+
+    view = client.post(
+        f"/api/encounters/{view['encounter']['id']}/facts/{heart_rate['id']}/review",
+        json={"expected_revision": view["encounter"]["revision"], "action": "approve"},
+    ).json()
+    assert next(r for r in view["prior_auth"]["requirements"] if r["requirement_id"] == "R7")["status"] == "SATISFIED"
+
+    view = client.post(
+        f"/api/encounters/{view['encounter']['id']}/facts/{heart_rate['id']}/review",
+        json={"expected_revision": view["encounter"]["revision"], "action": "reopen"},
+    ).json()
+    reopened = next(fact for fact in view["facts"] if fact["id"] == heart_rate["id"])
+    result = next(r for r in view["prior_auth"]["requirements"] if r["requirement_id"] == "R7")
+    assert reopened["review"]["status"] == "pending"
+    assert reopened["approved"] is None
+    assert result["status"] == "MISSING"
+    assert result["used_fact_ids"] == []
+    assert result["pending_fact_ids"] == [heart_rate["id"]]

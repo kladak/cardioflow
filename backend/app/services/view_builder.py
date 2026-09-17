@@ -42,7 +42,11 @@ def build_view(encounter: Encounter, provider: str = "mock") -> EncounterView:
     pending = [(f.id, f.fact_type) for f in encounter.facts if f.review.status is ReviewStatus.PENDING]
     policy = load_policy()
     authorization_applicable = encounter.context.fixture_id in {"hfref_golden", "hfref_ambiguous"}
-    prior = evaluate(policy, approved, pending, encounter.context, encounter.review_revision)
+    prior = (
+        evaluate(policy, approved, pending, encounter.context, encounter.review_revision)
+        if authorization_applicable
+        else None
+    )
     latest = encounter.exports[-1] if encounter.exports else None
     export_summary = (
         ExportSummary(
@@ -172,7 +176,7 @@ def list_item(e: Encounter) -> EncounterListItem:
         encounter_date=e.context.encounter_date.isoformat(),
         visit_type=e.context.visit_type,
         stage=view.stage,
-        readiness=view.prior_auth.overall,
+        readiness=view.prior_auth.overall if view.prior_auth else None,
         authorization_applicable=e.context.fixture_id in {"hfref_golden", "hfref_ambiguous"},
         updated_at=e.updated_at,
     )

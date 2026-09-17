@@ -83,7 +83,10 @@ def build_bundle(
                 **base,
             }
         elif f.fact_type is FactType.CONDITION_HISTORY:
-            code = "refuted" if f.approved.assertion is Assertion.NEGATED else "confirmed"
+            code = {
+                Assertion.NEGATED: "refuted",
+                Assertion.UNCERTAIN: "unconfirmed",
+            }.get(f.approved.assertion, "confirmed")
             r = {
                 "resourceType": "Condition",
                 "verificationStatus": {
@@ -92,6 +95,8 @@ def build_bundle(
                 "code": {"text": v.condition.replace("_", " ")},
                 **base,
             }
+            if v.timing_text:
+                r["note"] = [{"text": v.timing_text}]
         elif f.fact_type in {
             FactType.LVEF,
             FactType.RESTING_HEART_RATE,
@@ -113,12 +118,14 @@ def build_bundle(
                 **base,
             }
             if f.fact_type is FactType.LVEF:
-                r["valueQuantity"] = {
-                    "value": v.percent,
-                    "unit": "%",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "%",
-                }
+                quantity = {"unit": "%", "system": "http://unitsofmeasure.org", "code": "%"}
+                if v.percent_upper is not None:
+                    r["valueRange"] = {
+                        "low": {"value": v.percent, **quantity},
+                        "high": {"value": v.percent_upper, **quantity},
+                    }
+                else:
+                    r["valueQuantity"] = {"value": v.percent, **quantity}
                 resolved = resolve_spoken_date(v.measured_on_text, context.encounter_date)
                 if resolved:
                     r["effectiveDateTime"] = resolved.isoformat()
@@ -153,7 +160,10 @@ def build_bundle(
             }
             if typ == "MedicationStatement":
                 r["context"] = r.pop("encounter")
-            dose = " ".join(x for x in [v.dose_text or (str(v.dose_value) if v.dose_value else ""), v.frequency] if x)
+            structured_dose = (
+                f"{v.dose_value} {v.dose_unit}" if v.dose_value is not None and v.dose_unit else None
+            )
+            dose = " ".join(x for x in [v.dose_text or structured_dose or "", v.frequency] if x)
             r["intent"] = "plan" if typ == "MedicationRequest" else None
             r["dosageInstruction" if typ == "MedicationRequest" else "dosage"] = [{"text": dose}]
             r = {k: v2 for k, v2 in r.items() if v2 is not None}

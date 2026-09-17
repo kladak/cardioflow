@@ -71,5 +71,14 @@ def test_I_API_1_through_I_FHIR_2_golden_vertical_slice(tmp_path: Path) -> None:
     assert len(export["bundle"]["entry"]) == 15
     Bundle.model_validate(export["bundle"])
     approved_ids = {f["id"] for f in view["facts"] if f["review"]["status"] == "approved"}
+    full_urls = {entry["fullUrl"] for entry in export["bundle"]["entry"]}
     for entry in export["bundle"]["entry"][2:]:
         assert entry["resource"]["identifier"][0]["value"] in approved_ids
+    for entry in export["bundle"]["entry"]:
+        resource = entry["resource"]
+        for field in ("subject", "encounter", "context"):
+            if field in resource:
+                assert resource[field]["reference"] in full_urls
+    exported_fact_ids = {fact_id for item in export["manifest"] for fact_id in item["fact_ids"]}
+    excluded_fact_ids = {item["fact_id"] for item in export["excluded"]}
+    assert exported_fact_ids | excluded_fact_ids == approved_ids

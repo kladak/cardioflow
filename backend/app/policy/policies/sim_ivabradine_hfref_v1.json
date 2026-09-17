@@ -1,6 +1,6 @@
 {
   "id": "sim-ivabradine-hfref",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "simulated": true,
   "display_name": "Ivabradine documentation-readiness demonstration",
   "payer_display": "CardioFlow demonstration rules",
@@ -184,17 +184,25 @@
     },
     {
       "id": "R9",
-      "title": "Blood pressure at or above 90/50 mmHg",
-      "policy_text": "The approved blood pressure is at or above 90/50 mmHg.",
+      "title": "Demonstration blood-pressure threshold (90/50 mmHg)",
+      "policy_text": "The approved blood pressure is at or above the CardioFlow demonstration threshold of 90/50 mmHg.",
       "evaluator": "blood_pressure_at_least",
       "params": {"min_systolic": 90, "min_diastolic": 50},
       "fact_types": ["blood_pressure"],
       "operator": "greater_than_or_equal",
       "threshold": {"min_systolic": 90, "min_diastolic": 50},
       "unit": "mmHg",
-      "provenance_classification": "unsupported_or_unclear",
-      "provenance_note": "The current FDA prescribing information lists clinically significant hypotension as a contraindication but does not state this numeric cutoff. The demo retains 90/50 only to preserve the existing deterministic scenario and does not present it as current clinical or coverage policy.",
+      "provenance_classification": "application_specific_demo_rule",
+      "provenance_note": "The initial 2015 FDA prescribing information used a blood-pressure-below-90/50-mmHg contraindication. The current prescribing information instead says clinically significant hypotension without that numeric cutoff. CardioFlow retains 90/50 only as an application-specific demonstration threshold; it is not presented as current clinical guidance or payer policy.",
       "criterion_sources": [
+        {
+          "title": "Archived 2015 CORLANOR (ivabradine) prescribing information",
+          "organization": "U.S. Food and Drug Administration",
+          "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/206143orig1s000lbl.pdf",
+          "section": "4 Contraindications",
+          "version_or_date": "Initial U.S. approval, April 2015",
+          "source_type": "fda_prescribing_information"
+        },
         {
           "title": "CORLANOR (ivabradine) prescribing information",
           "organization": "U.S. National Library of Medicine DailyMed",

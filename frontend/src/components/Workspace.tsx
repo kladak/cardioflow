@@ -11,17 +11,20 @@ type Fact = Omit<GeneratedFact, "candidate"> & {
     | null;
 };
 type GeneratedView = components["schemas"]["EncounterView"];
-type GeneratedRequirement = GeneratedView["prior_auth"]["requirements"][number];
+type GeneratedPriorAuth = NonNullable<GeneratedView["prior_auth"]>;
+type GeneratedRequirement = GeneratedPriorAuth["requirements"][number];
 type View = Omit<GeneratedView, "facts" | "prior_auth"> & {
   facts: Fact[];
-  prior_auth: Omit<GeneratedView["prior_auth"], "requirements"> & {
-    requirements: Array<
-      Omit<GeneratedRequirement, "used_fact_ids" | "pending_fact_ids"> & {
-        used_fact_ids: string[];
-        pending_fact_ids: string[];
-      }
-    >;
-  };
+  prior_auth:
+    | (Omit<GeneratedPriorAuth, "requirements"> & {
+        requirements: Array<
+          Omit<GeneratedRequirement, "used_fact_ids" | "pending_fact_ids"> & {
+            used_fact_ids: string[];
+            pending_fact_ids: string[];
+          }
+        >;
+      })
+    | null;
 };
 type GeneratedExport = components["schemas"]["ExportDetail"];
 type ExportDetail = Omit<GeneratedExport, "bundle" | "excluded"> & {
@@ -303,7 +306,7 @@ export default function Workspace({ id }: { id: string }) {
     );
   const p = view.encounter.patient,
     c = view.encounter.context;
-  const satisfied = view.prior_auth.requirements.filter(
+  const satisfied = (view.prior_auth?.requirements || []).filter(
     (r) => r.status === "SATISFIED",
   ).length;
   const requirementCount = view.authorization_policy?.requirements.length || 0;
@@ -370,9 +373,9 @@ export default function Workspace({ id }: { id: string }) {
         </div>
         {supportsAuthorization && (
           <div className={`stage ${currentStage === "authorization" ? "current" : ""}`}>
-            <span>4. Authorization</span>
+            <span>4. Documentation readiness</span>
             <span className="status">
-              Approved findings · {view.prior_auth.overall.replaceAll("_", " ")} · {satisfied}/{requirementCount}
+              Approved findings · {view.prior_auth?.overall.replaceAll("_", " ")} · {satisfied}/{requirementCount}
             </span>
           </div>
         )}
@@ -427,7 +430,7 @@ export default function Workspace({ id }: { id: string }) {
                     className={`tab ${tab === "authorization" ? "active" : ""}`}
                     onClick={() => navigate("authorization")}
                   >
-                    Authorization criteria
+                    Documentation criteria
                   </button>
                 )}
                 <button
@@ -534,7 +537,7 @@ function CurrentAction({
       : [
           "Review complete",
           supportsAuthorization
-            ? "All findings have a clinician decision. Inspect how approved evidence changes the authorization result."
+            ? "All findings have a clinician decision. Inspect how approved evidence changes the configured documentation checks."
             : "All findings have a clinician decision. Inspect the verified note or create a structured export.",
         ],
     note: [
@@ -543,7 +546,7 @@ function CurrentAction({
     ],
     authorization: [
       "Inspect the documentation-readiness checks",
-      "Each row separates the patient transcript source from the source for the criterion. Edit the approved heart rate to update the result.",
+      "Each row separates patient transcript evidence from criterion provenance. Edit the approved heart rate to update the configured result.",
     ],
     export: [
       "Export the verified record",
@@ -563,7 +566,7 @@ function CurrentAction({
           className="btn primary small"
           onClick={() => onNavigate(supportsAuthorization ? "authorization" : "note")}
         >
-          {supportsAuthorization ? "View authorization result" : "View verified note"} →
+          {supportsAuthorization ? "View documentation result" : "View verified note"} →
         </button>
       )}
     </div>
@@ -593,7 +596,7 @@ function Extract({
       <div className="boundary">
         <strong>Not yet approved</strong>
         <br />
-        Proposed findings are excluded from the note, authorization check, and
+        Proposed findings are excluded from the note, documentation check, and
         FHIR export.
       </div>
       {failed && (
@@ -1138,7 +1141,7 @@ function Authorization({
   onFact: (id: string) => void;
 }) {
   const policy = view.authorization_policy;
-  if (!policy) return null;
+  if (!policy || !view.prior_auth) return null;
   const outcome = view.prior_auth.overall;
   const requirements = new Map(policy.requirements.map((requirement) => [requirement.id, requirement]));
   return (
@@ -1261,7 +1264,11 @@ function Authorization({
                   ))}
                 </section>
                 <section>
-                  <span className="criterion-label">Criterion source</span>
+                  <span className="criterion-label">
+                    {criterion.provenance_classification === "application_specific_demo_rule"
+                      ? "Source context"
+                      : "Criterion source"}
+                  </span>
                   {firstSource ? (
                     <>
                       <a href={firstSource.url} target="_blank" rel="noreferrer">

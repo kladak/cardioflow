@@ -182,7 +182,7 @@ describe("CardioFlow encounter workspace", () => {
     mockedApi.mockResolvedValue(baseView as never);
     render(<Workspace id="enc_test" />);
 
-    fireEvent.click(await screen.findByRole("button", { name: "Authorization criteria" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Documentation criteria" }));
 
     expect(screen.getByText("Patient value")).toBeVisible();
     expect(screen.getByText("Patient source: Transcript turn 7 (clinician)")).toBeVisible();
@@ -221,6 +221,6 @@ describe("CardioFlow encounter workspace", () => {
     render(<Workspace id="enc_test" />);
 
     await screen.findByRole("button", { name: "Verified note" });
-    expect(screen.queryByRole("button", { name: "Authorization criteria" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Documentation criteria" })).not.toBeInTheDocument();
   });
 });
