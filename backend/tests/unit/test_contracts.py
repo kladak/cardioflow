@@ -114,6 +114,9 @@ def test_every_policy_requirement_has_explicit_provenance() -> None:
         "R9": ProvenanceClassification.DEMO_RULE,
     }
     assert not any(value is ProvenanceClassification.PAYER_SPECIFIC for value in classifications.values())
+    requirements = {requirement.id: requirement for requirement in policy.requirements}
+    assert requirements["R8"].params["accepted"] == ["at_max_tolerated_dose", "contraindicated"]
+    assert len(requirements["R9"].criterion_sources) == 2
     for requirement in policy.requirements:
         assert requirement.operator
         assert requirement.provenance_note

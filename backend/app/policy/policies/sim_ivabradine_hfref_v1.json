@@ -161,15 +161,15 @@
     {
       "id": "R8",
       "title": "Beta-blocker dose status",
-      "policy_text": "The approved record documents a maximally tolerated beta-blocker dose, a contraindication, or intolerance.",
+      "policy_text": "The approved record documents a maximally tolerated beta-blocker dose or a contraindication.",
       "evaluator": "beta_blocker_optimized",
-      "params": {"accepted": ["at_max_tolerated_dose", "contraindicated", "not_tolerated"]},
+      "params": {"accepted": ["at_max_tolerated_dose", "contraindicated"]},
       "fact_types": ["beta_blocker_dose_status", "medication"],
       "operator": "one_of",
-      "threshold": ["at_max_tolerated_dose", "contraindicated", "not_tolerated"],
+      "threshold": ["at_max_tolerated_dose", "contraindicated"],
       "unit": null,
       "provenance_classification": "supported_by_authoritative_source",
-      "provenance_note": "The FDA prescribing information specifies maximally tolerated beta-blocker doses or a contraindication to beta-blocker use. The demo also accepts documented intolerance as review-ready evidence.",
+      "provenance_note": "The FDA prescribing information specifies maximally tolerated beta-blocker doses or a contraindication to beta-blocker use. Other beta-blocker status values do not satisfy this check.",
       "criterion_sources": [
         {
           "title": "CORLANOR (ivabradine) prescribing information",
